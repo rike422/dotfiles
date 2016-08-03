@@ -1,0 +1,75 @@
+[include]
+  path = ~/.gitconfig_local
+[color]
+ ui = auto
+ diff = auto
+ grep = auto
+ branch = auto
+ status = auto
+ interactive = auto
+[core]
+	excludesfile = /Users/rike422/.gitignore_global
+	editor = vim
+[pull]
+ rebase = true
+[alias]
+	# View the SHA, description, and history graph of the latest 20 commits
+	l = log --pretty=oneline -n 20 --graph
+	# View the current working tree status using the short format
+	s = status -s
+	# Show the diff between the latest commit and the current state
+	d = !"git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
+	# `git di $number` shows the diff between the state `$number` revisions ago and the current state
+	di = !"d() { git diff --patch-with-stat HEAD~$1; }; git diff-index --quiet HEAD -- || clear; d"
+	# Pull in remote changes for the current repository and all its submodules
+	p = !"git pull; git submodule foreach git pull origin master"
+	# Clone a repository including all submodules
+	c = clone --recursive
+	# Add & Track remote branch
+	# ex 'git ar <branch name>'
+	ar = !sh -c 'git checkout -b $0 origin/$0'
+	# Publish current branch to Remote
+	# ex 'git pub'
+	pub = !sh -c 'git push -u origin $(git rev-parse --abbrev-ref HEAD)'
+	# stage all changes (including removed files)
+	sa = add -A
+	# unstage a single file
+	# ex 'git us <file>'
+	us = reset HEAD
+	# discard modified changes
+	dm = checkout .
+	pc = !git push origin `git rev-parse --abbrev-ref HEAD`
+	# discard all changes made (including removing untracked files)
+	discardall = !git clean -df && git checkout .
+	# Commit all changes
+	ca = !git add -A && git commit -av
+	# Switch to a branch, creating it if necessary
+	go = checkout -B
+	# Show verbose output about tags, branches or remotes
+	tags = tag -l
+	branches = branch -a
+	remotes = remote -v
+	# Credit an author on the latest commit
+	credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
+	# Interactive rebase with the given number of latest commits
+	reb = "!r() { git rebase -i HEAD~$1; }; r"
+	# Undo a `git push`
+	undopush = push -f origin HEAD^:master
+	# Various other shorthands
+	st = status
+	ci = commit
+	br = branch
+	co = checkout
+	mr = merge
+	df = diff
+	dc = diff --cached
+	lg = log -p
+	lol = log --graph --decorate --pretty=oneline --abbrev-commit
+	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+	ls = ls-files
+	sta = stash
+	ksreview = "!f() { local SHA=${1:-HEAD}; local BRANCH=${2:-master}; if [ $SHA == $BRANCH ]; then SHA=HEAD; fi; git difftool -y -t Kaleidoscope $BRANCH...$SHA; }; f"
+[url "https://"]
+	insteadOf = git://
+[credential]
+	helper = osxkeychain
