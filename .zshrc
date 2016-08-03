@@ -50,13 +50,22 @@ zle -N history-beginning-search-forward-end history-search-end
 bindkey "^P" history-beginning-search-backward-end
 bindkey "^N" history-beginning-search-forward-end
 
-# すべてのヒストリを表示する
-function history-all { history -E 1 }
-
-## export original variable
 export DOTFILES=$HOME/dotfiles
-DEST=$DOTFILES/pkg/nodebrew
-source $DOTFILES/pkg/zplug/init.zsh
+
+## zplugの読み込み
+export ZPLUG_HOME=$DOTFILES/pkg/zplug
+if [ -d "$DOTFILES/pkg/zplug" ]; then
+  source $ZPLUG_HOME/init.zsh
+  if ! zplug check; then
+    zplug install
+  fi
+  zplug load
+else
+  $DOTFILES/install/install-zplug.sh
+  zplug install
+  source $HOME/.zshrc
+fi
+
 # ------------------------------
 # Look And Feel Settings
 # ------------------------------
