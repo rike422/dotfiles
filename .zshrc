@@ -151,6 +151,7 @@ if [ -x "`hub`" ]; then
 fi
 
 # include
+[ -f $DOTFILES/zsh/plugins.zsh ] && source $DOTFILES/zsh/plugins.zsh
 [ -f $DOTFILES/zsh/common.zsh ] && source $DOTFILES/zsh/common.zsh
 [ -f $DOTFILES/zsh/auto_complete.zsh ] && source $DOTFILES/zsh/auto_complete.zsh
 [ -f $DOTFILES/zsh/show_branch.zsh ] && source $DOTFILES/zsh/show_branch.zsh
@@ -160,4 +161,5 @@ fi
 [ -f $DOTFILES/local/zsh/alias.zsh ] && source $DOTFILES/local/zsh/alias.zsh
 
 # export
+
 export PGDATA=/usr/local/var/postgres
