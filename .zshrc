@@ -113,6 +113,25 @@ cheat-sheet () { zle -M "`cat ~/zsh/cheat-sheet.conf`" }
 zle -N cheat-sheet
 bindkey "^[^h" cheat-sheet
 
+# -----------------------------
+# includes
+# -----------------------------
+
+[ -f $DOTFILES/zsh/plugins.zsh ] && source $DOTFILES/zsh/plugins.zsh
+[ -f $DOTFILES/zsh/common.zsh ] && source $DOTFILES/zsh/common.zsh
+[ -f $DOTFILES/zsh/auto_complete.zsh ] && source $DOTFILES/zsh/auto_complete.zsh
+[ -f $DOTFILES/zsh/show_branch.zsh ] && source $DOTFILES/zsh/show_branch.zsh
+[ -f $DOTFILES/zsh/peco.zsh ] && source $DOTFILES/zsh/peco.zsh
+
+# include localfile
+[ -f $DOTFILES/local/zsh/alias.zsh ] && source $DOTFILES/local/zsh/alias.zsh
+
+# -----------------------------
+# exports
+# -----------------------------
+
+[ -d "$DOTFILES/bin" ] && export PATH=$DOTFILES/bin:$PATH
+
 #zsh-completions
 if [ -e /usr/local/share/zsh-completions ]; then
   fpath=(/usr/local/share/zsh-completions $fpath)
@@ -150,16 +169,11 @@ if [ -x "`hub`" ]; then
   eval "$(hub alias -s)"
 fi
 
-# include
-[ -f $DOTFILES/zsh/plugins.zsh ] && source $DOTFILES/zsh/plugins.zsh
-[ -f $DOTFILES/zsh/common.zsh ] && source $DOTFILES/zsh/common.zsh
-[ -f $DOTFILES/zsh/auto_complete.zsh ] && source $DOTFILES/zsh/auto_complete.zsh
-[ -f $DOTFILES/zsh/show_branch.zsh ] && source $DOTFILES/zsh/show_branch.zsh
-[ -f $DOTFILES/zsh/peco.zsh ] && source $DOTFILES/zsh/peco.zsh
-
-# include localfile
-[ -f $DOTFILES/local/zsh/alias.zsh ] && source $DOTFILES/local/zsh/alias.zsh
-
-# export
-
-export PGDATA=/usr/local/var/postgres
+###
+# exports (homebrew)
+###
+if [ `uname` = "Darwin" ]; then
+  if [ -x "`echo $commands[postgres]`" ]; then
+    export PGDATA=/usr/local/var/postgres
+  fi
+fi
