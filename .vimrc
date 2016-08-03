@@ -1,4 +1,3 @@
-syntax enable
 set number
 set ruler
 set list
@@ -20,9 +19,6 @@ set shiftwidth=2
 set helplang=en
 
 set backspace=indent,eol,start
-
-colorscheme desert
-
 nnoremap <Space>w  :<C-u>w<CR>
 nnoremap <Space>q  :<C-u>q<CR>
 nnoremap <Space>Q  :<C-u>q!<CR>
@@ -107,10 +103,8 @@ if dein#load_state(s:dein_dir)
   let s:toml      = g:rc_dir . '/dein.toml'
   let s:lazy_toml = g:rc_dir . '/dein_lazy.toml'
 
-  " TOML を読み込み、キャッシュしておく
   call dein#load_toml(s:toml,      {'lazy': 0})
   call dein#load_toml(s:lazy_toml, {'lazy': 1})
-
   call dein#end()
   call dein#save_state()
 endif
@@ -118,3 +112,8 @@ endif
 if dein#check_install()
   call dein#install()
 endif
+
+filetype plugin indent on
+syntax on
+colorscheme desert
+set background=dark
