@@ -19,6 +19,8 @@ set tabstop=2
 set shiftwidth=2
 set helplang=en
 
+set backspace=indent,eol,start
+
 colorscheme desert
 
 nnoremap <Space>w  :<C-u>w<CR>
