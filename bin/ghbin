@@ -1,0 +1,43 @@
+
+#!/usr/bin/env ruby
+# https://github.com/Jxck/dotfiles/blob/a992c248ffbd0c547bddde3418772e8dd5410482/bin/ghbin
+
+HELP=<<EOS
+Download build binary from github release
+64bit version via zip or taball
+$ ghbin peco/peco
+EOS
+
+arg = ARGV[0]
+
+if arg == nil || arg == "-h"
+  puts HELP
+  exit 0
+end
+
+arch = `uname`.chop.downcase
+
+arg = ARGV.shift
+owner, repo = arg.split('/')
+
+releases = "https://api.github.com/repos/#{owner}/#{repo}/releases/latest"
+puts "\nACCESS TO: #{releases}\n\n"
+
+url = `curl -L #{releases} | jq '.assets | .[] | .browser_download_url' | grep #{arch} | grep 64`.chomp.gsub(/"/, ' ').strip
+puts "\nTARGET URL: #{url}\n\n"
+
+archive = url.split('/').pop
+file = archive.split('.').shift
+
+`curl -L #{url} --output /tmp/#{archive}`
+puts "\nSAVE TO: /tmp#{archive}\n\n"
+
+if archive.match('tar.gz')
+  `tar zxf /tmp/#{archive} -C /tmp`
+else
+  `mkdir /tmp/#{file}`
+  `unzip -j /tmp/#{archive} -d /tmp/#{file}`
+end
+
+`mv /tmp/#{file} $DOTFILES/pkg/#{repo}`
+puts "\nMOVE TO: $DOTFILES/pkg/#{repo}\n\n"
