@@ -88,76 +88,31 @@ cnoremap <C-v> <C-f>a
 """"""""""""""""""""""""""""""
 " プラグインのセットアップ
 """"""""""""""""""""""""""""""
-if has('vim_starting')
-  set nocompatible
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
+let s:dein_dir = expand('~/.vim/dein')
+let s:dein_repo_dir = s:dein_dir . '/repos/github.com/Shougo/dein.vim'
+
+if &runtimepath !~# '/dein.vim'
+  if !isdirectory(s:dein_repo_dir)
+    execute '!git clone https://github.com/Shougo/dein.vim' s:dein_repo_dir
+  endif
+  execute 'set runtimepath^=' . fnamemodify(s:dein_repo_dir, ':p')
 endif
 
-" Required:
-call neobundle#begin(expand('~/.vim/bundle/'))
-" Required:
-" ファイル関連
-NeoBundleFetch 'Shougo/neobundle.vim'
-" Unite.vimで最近使ったファイルを表示できるようにする
-NeoBundle 'Shougo/neomru.vim'
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'Shougo/vimfiler'
+if dein#load_state(s:dein_dir)
+  call dein#begin(s:dein_dir)
 
-" エディタ設定
-" インデントに色を付けて見やすくする
-NeoBundle 'nathanaelkane/vim-indent-guides'
-" 行末スペース削除
-NeoBundle 'bronson/vim-trailing-whitespace'
-let g:indent_guides_enable_on_vim_startup = 1
+  let g:rc_dir    = expand('~/.vim/rc')
+  let s:toml      = g:rc_dir . '/dein.toml'
+  let s:lazy_toml = g:rc_dir . '/dein_lazy.toml'
 
-" rust
-NeoBundle 'phildawes/racer', {
-\   'build' : {
-\     'mac': 'cargo build --release',
-\     'unix': 'cargo build --release',
-\   }
-\ }
-NeoBundle 'rust-lang/rust.vim'
+  " TOML を読み込み、キャッシュしておく
+  call dein#load_toml(s:toml,      {'lazy': 0})
+  call dein#load_toml(s:lazy_toml, {'lazy': 1})
 
-"""""""""""""""""""""""""""""""
-" color schemes
-""""""""""""""""""""""""""""""
-NeoBundle 'nanotech/jellybeans.vim'
-NeoBundle 'w0ng/vim-hybrid'
-NeoBundle 'vim-scripts/twilight'
-NeoBundle 'jonathanfilip/vim-lucius'
-NeoBundle 'jpo/vim-railscasts-theme'
-NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'vim-scripts/Wombat'
-NeoBundle 'tomasr/molokai'
-NeoBundle 'vim-scripts/rdark'
-NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'croaker/mustang-vim'
-NeoBundle 'vim-scripts/Lucius'
-NeoBundle 'vim-scripts/Zenburn'
-NeoBundle 'mrkn/mrkn256.vim'
-NeoBundle 'jpo/vim-railscasts-theme'
-NeoBundle 'therubymug/vim-pyte'
-" uniteでのcolorschem選択
-NeoBundle 'ujihisa/unite-colorscheme'
+  call dein#end()
+  call dein#save_state()
+endif
 
-
-call neobundle#end()
-" Required:
-filetype plugin indent on
-NeoBundleCheck
-""""""""""""""""""""""""""""""
-" unite
-""""""""""""""""""""""""""""""
-let g:unite_source_history_yank_enable = 1
-try
-  let g:unite_source_rec_async_command='ag --nocolor --nogroup -g ""'
-  call unite#filters#matcher_default#use(['matcher_fuzzy'])
-catch
-endtry
-" search a file in the filetree
-nnoremap <space><space> :split<cr> :<C-u>Unite -start-insert file_rec/async
-" reset not it is <C-l> normally
-:nnoremap <space>r <Plug>(unite_restart)
-:let g:vimfiler_as_default_explorer = 1
-
+if dein#check_install()
+  call dein#install()
+endif

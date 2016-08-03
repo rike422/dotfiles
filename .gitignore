@@ -2,7 +2,7 @@
 .zsh_history
 .vim/.netrwhist
 .vim/.netrwbook
-.vim/bundle
+.vim/dein
 .vim/view
 node_modules
 tmp

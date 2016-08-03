@@ -1,0 +1,61 @@
+[[plugins]]
+repo = 'Shougo/dein.vim'
+
+[[plugins]]
+repo = 'Shougo/vimproc.vim'
+build = 'make'
+
+###
+# color schemes
+###
+[[plugins]]
+repo = 'nanotech/jellybeans.vim'
+
+[[plugins]]
+repo = 'w0ng/vim-hybrid'
+
+[[plugins]]
+repo = 'vim-scripts/twilight'
+
+[[plugins]]
+repo = 'jonathanfilip/vim-lucius'
+
+[[plugins]]
+repo = 'jpo/vim-railscasts-theme'
+
+[[plugins]]
+repo = 'altercation/vim-colors-solarized'
+
+[[plugins]]
+repo = 'vim-scripts/Wombat'
+
+[[plugins]]
+repo = 'tomasr/molokai'
+
+[[plugins]]
+repo = 'vim-scripts/rdark'
+
+[[plugins]]
+repo = 'altercation/vim-colors-solarized'
+
+[[plugins]]
+repo = 'croaker/mustang-vim'
+
+[[plugins]]
+repo = 'vim-scripts/Lucius'
+
+[[plugins]]
+repo = 'vim-scripts/Zenburn'
+
+[[plugins]]
+repo = 'mrkn/mrkn256.vim'
+
+[[plugins]]
+repo = 'jpo/vim-railscasts-theme'
+
+[[plugins]]
+repo = 'therubymug/vim-pyte'
+
+# uniteでのcolorschem選択
+[[plugins]]
+repo = 'ujihisa/unite-colorscheme'
