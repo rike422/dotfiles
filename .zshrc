@@ -146,6 +146,10 @@ if [ -e /usr/local/share/zsh-completions ]; then
   fpath=(/usr/local/share/zsh-completions $fpath)
 fi
 
+if [ -d "$DOTFILES/pkg/rust" ]; then
+  source $HOME/.cargo/env
+fi
+
 # golang
 if [ -x "`which go`" ]; then
   export GOROOT=`go env GOROOT`
