@@ -174,7 +174,8 @@ if [ -f $DOTFILES/pkg/nodebrew/nodebrew ]; then
 fi
 
 # hub
-if [ -x "`hub`" ]; then
+if [ -d "$DOTFILES/pkg/hub/bin"  ]; then
+  export PATH=$DOTFILES/pkg/hub/bin:$PATH
   eval "$(hub alias -s)"
 fi
 
