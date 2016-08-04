@@ -9,7 +9,7 @@
  interactive = auto
 [core]
 	excludesfile = /Users/rike422/.gitignore_global
-	editor = vim
+	editor = $(which vim)
 [pull]
  rebase = true
 [alias]
