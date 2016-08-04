@@ -1,4 +1,3 @@
-
 #!/usr/bin/env ruby
 # https://github.com/Jxck/dotfiles/blob/a992c248ffbd0c547bddde3418772e8dd5410482/bin/ghbin
 
@@ -27,16 +26,18 @@ url = `curl -L #{releases} | jq '.assets | .[] | .browser_download_url' | grep #
 puts "\nTARGET URL: #{url}\n\n"
 
 archive = url.split('/').pop
-file = archive.split('.').shift
+extension = archive.match('tar.gz') || archive.match('tgz')
+puts extension
 
 `curl -L #{url} --output /tmp/#{archive}`
-puts "\nSAVE TO: /tmp#{archive}\n\n"
-
-if archive.match('tar.gz')
-  `tar zxf /tmp/#{archive} -C /tmp`
-else
+puts "\nSAVE TO: /tmp/#{archive}\n\n"
+if extension.nil?
+  file = archive.delete('.').shift
   `mkdir /tmp/#{file}`
   `unzip -j /tmp/#{archive} -d /tmp/#{file}`
+else
+  file = archive.sub(".#{extension[0]}", '')
+  `tar zxf /tmp/#{archive} -C /tmp`
 end
 
 `mv /tmp/#{file} $DOTFILES/pkg/#{repo}`
