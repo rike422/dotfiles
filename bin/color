@@ -111,7 +111,7 @@ def color_line(line)
 
   splitted
     .zip(@LineColor)
-    .map{|x| color(x[0], x[1])}
+    .map{ |x| color(x[0], x[1])}
     .join('')
 end
 
@@ -123,14 +123,14 @@ end
 args = ARGV
 while line = STDIN.gets
   if args.size > 0
-    args.zip(@WordColor).map{|arg|
+    args.zip(@WordColor).map do |arg|
       word = arg[0]
       code = arg[1]
       reg = Regexp.compile(word, Regexp::IGNORECASE)
-      line = line.gsub(reg) {|match|
+      line = line.gsub(reg) do |match|
         color(match, code)
-      }
-    }
+      end
+    end
     STDOUT.print line
   else
     STDOUT.print color_line(line)
