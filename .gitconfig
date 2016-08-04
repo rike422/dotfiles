@@ -73,3 +73,5 @@
 	insteadOf = git://
 [credential]
 	helper = osxkeychain
+[user]
+	useConfigOnly = true
