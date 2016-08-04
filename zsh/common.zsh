@@ -6,6 +6,8 @@ alias -g H="| xxd -g 1 -c 4" # Hex
 alias -g V="2>&1 | vim -c "au! CursorHold" -" # open stdout with vim
 alias -g U="| sort | uniq -c | sort -nr"
 
+alias vi="vim"
+
 alias tree="tree --charset unicode -L 3"
 alias re="exec $SHELL"
 alias be="bundle exec"
