@@ -1,3 +1,7 @@
+########
+# main view
+########
+
 # rebase -i をマッピング
 bind main    R !git rebase -i %(commit)
 bind diff    R !git rebase -i %(commit)
@@ -8,6 +12,35 @@ set main-view = id date author commit-title:graph=yes,refs=yes
 set diff-context = 6
 # vim: set expandtab sw=4 tabstop=4:
 # # *color* 'area' 'fgcolor' 'bgcolor' '[attributes]'
+
+# 特定のコミットをチェックアウト
+bind main C !?git checkout %(commit)↲
+
+########
+# branch view
+########
+
+# リモートブランチをtrackしつつチェックアウト
+bind branch T !git checkout -t %(branch)
+# カーソル行のブランチを親にして入力した名前のブランチを作成
+bind branch n !git checkout -b %(prompt) %(branch)
+# 不要になったブランチを削除（squash mergeや別リポジトリへのmergeをするワークフロー用）
+bind branch D !?git branch -D %(branch)
+# 不要になったブランチを削除
+bind branch d !?git branch -d %(branch)
+# originへのpush
+bind branch P !git push -u origin %(branch)
+# リポジトリのGitHubを表示
+bind generic ^ !@hub browse
+
+# issuesを表示
+bind generic - !@hub browse -- issues
+
+# 選択したcommitをGitHubで表示
+bind generic ~ !@hub browse -- commit/%(commit)
+
+# 選択したcommitのci-statusを確認
+bind generic = !hub ci-status %(commit)
 
 # 横分割強制
 set vertical-split = no
