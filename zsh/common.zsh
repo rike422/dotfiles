@@ -9,6 +9,8 @@ alias -g U="| sort | uniq -c | sort -nr"
 alias tree="tree --charset unicode -L 3"
 alias re="exec $SHELL"
 alias be="bundle exec"
+alias nr="npm run"
+
 alias rmf="\rm -rf"
 alias cdd="cd $DOTFILES"
 alias cddb="cd $DOTFILES/bin"
