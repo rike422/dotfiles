@@ -59,7 +59,6 @@ if [ -d "$DOTFILES/pkg/zplug" ]; then
   if ! zplug check; then
     zplug install
   fi
-  zplug load
 else
   $DOTFILES/install/install-zplug.sh
   zplug install
@@ -135,6 +134,7 @@ bindkey "^[^h" cheat-sheet
 # include localfile
 [ -f $DOTFILES/local/zsh/alias.zsh ] && source $DOTFILES/local/zsh/alias.zsh
 
+zplug load --verbose
 # -----------------------------
 # exports
 # -----------------------------
