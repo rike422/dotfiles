@@ -29,5 +29,8 @@ git clone https://github.com/sstephenson/rbenv $DEST
 mkdir -p $DEST/plugins
 git clone https://github.com/sstephenson/ruby-build $DEST/plugins/ruby-build
 
+# install rbenv default-gems
+ln -s $DOTFILES/misc/rbenv/default-gems $DEST
+
 $DEST/bin/rbenv install 2.3.1
 $DEST/bin/rbenv global 2.3.1
