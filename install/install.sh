@@ -7,7 +7,6 @@ echo "alias ls='ls -la --col'" >> ~/.bashrc
 export DOTFILES=`dirname $0`/..
 echo DOTFILES=$DOTFILES
 
-
 ###################
 # distoribute
 ###################
@@ -68,6 +67,7 @@ elif [ `uname` = "Darwin" ]; then
   tmux \
   tree \
   zsh \
+  git \
   vim \
   rmtrash \
   wget \
@@ -91,10 +91,8 @@ fi
 
 # install tmux v2
 $DOTFILES/install/install-tmux2.sh
-
-
 # install gibo
-$DOTFILES/install/gibo.sh
+$DOTFILES/install/zplug.sh
 
 # link dotfiles to home
 $DOTFILES/bin/slink.sh
