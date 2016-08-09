@@ -151,10 +151,10 @@ if [ -d "$DOTFILES/pkg/rust" ]; then
 fi
 
 # golang
-if [ -x "`which go`" ]; then
-  export GOROOT=`go env GOROOT`
-  export GOPATH=$HOME/go
+if [ -d "$DOTFILES/pkg/gobrew/bin" ]; then
+  export GOROOT=$DOTFILES/pkg/gobrew
   export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+  eval "$(gobrew init -)"
 fi
 
 # rbenv
