@@ -14,11 +14,13 @@ function branch-status-check {
   branchname=`get-branch-name`
   # ブランチ名が無いので除外
   if [[ -z $branchname ]]; then
+    echo "%{${fg[cyan]}%}Zzz...(¦3[:::] %{${reset_color}%}"
     return
   fi
   prefix=`get-branch-status` #色だけ返ってくる
   suffix='%{'${reset_color}'%}'
-  echo ${prefix}${branchname}${suffix}
+
+  echo "${prefix}(${branchname})${suffix} =>"
 }
 
 function get-branch-name {
