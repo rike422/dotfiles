@@ -11,5 +11,8 @@ zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
 # ゴミ箱
 zplug "b4b4r07/zsh-gomi", if:"which fzf"
 
-# git atm
+# 移動
+zplug "b4b4r07/enhancd", use:init.sh
+
+# myplguin
 zplug "rike422/git-atm"
