@@ -8,7 +8,7 @@
  status = auto
  interactive = auto
 [core]
-	excludesfile = /Users/rike422/.gitignore_global
+	excludesfile = ~/.gitignore_global
 	editor = $(which vim)
 [pull]
  rebase = true
