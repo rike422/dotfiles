@@ -10,3 +10,6 @@ zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
 
 # ゴミ箱
 zplug "b4b4r07/zsh-gomi", if:"which fzf"
+
+# git atm
+zplug "rike422/git-atm"
