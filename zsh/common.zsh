@@ -28,6 +28,7 @@ alias diff="colordiff"
 alias less="less -R"
 alias npn="npm-popute"
 
+alias g='git'
 
 ### Commnads ###
 
