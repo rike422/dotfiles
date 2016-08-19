@@ -7,6 +7,9 @@ zplug "mrowa44/emojify", as:command
 #シンタックスハイライト
 zplug "zsh-users/zsh-syntax-highlighting", nice:10
 
+# zsh-syntax-highlight
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
+
 # インタラクティブフィルタ
 zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
 zplug "junegunn/fzf", as:command, use:bin/fzf-tmux
