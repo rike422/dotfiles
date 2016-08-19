@@ -44,6 +44,8 @@ setopt hist_reduce_blanks # 余分なスペースを削除してヒストリに�
 
 # マッチしたコマンドのヒストリを表示できるようにする
 autoload history-search-end
+autoload -Uz zmv
+
 #autoload predict-on
 zle -N history-beginning-search-backward-end history-search-end
 zle -N history-beginning-search-forward-end history-search-end

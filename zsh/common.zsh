@@ -18,6 +18,8 @@ alias cdd="cd $DOTFILES"
 alias cddb="cd $DOTFILES/bin"
 alias cddi="cd $DOTFILES/install"
 
+alias zmv='noglob zmv -W'
+
 alias ll="ls -ah"
 alias lls="ls -a"
 
@@ -25,6 +27,7 @@ alias pry="nocorrect pry"
 alias diff="colordiff"
 alias less="less -R"
 alias npn="npm-popute"
+
 
 ### Commnads ###
 
