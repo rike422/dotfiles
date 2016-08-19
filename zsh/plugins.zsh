@@ -18,4 +18,4 @@ zplug "b4b4r07/zsh-gomi", if:"which fzf"
 zplug "b4b4r07/enhancd", use:init.sh
 
 # myplguin
-zplug "rike422/git-atm"
+zplug "rike422/git-tmp"
