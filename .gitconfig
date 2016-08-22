@@ -9,7 +9,7 @@
  interactive = auto
 [core]
 	excludesfile = ~/.gitignore_global
-	editor = $(which vim)
+	editor = /usr/local/bin/vim
 [pull]
  rebase = true
 [alias]
