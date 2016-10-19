@@ -115,5 +115,4 @@ endif
 
 filetype plugin indent on
 syntax on
-colorscheme desert
 set background=dark
