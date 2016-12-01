@@ -20,3 +20,6 @@ zplug "b4b4r07/enhancd", use:init.sh
 # myplguin
 zplug "rike422/git-tmp"
 zplug "rike422/git-wip", if: "which hub"
+
+# git
+zplug "rimraf/k"
