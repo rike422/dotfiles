@@ -3,6 +3,7 @@ zplug "zsh-users/zsh-completions"
 
 # 絵文字
 zplug "mrowa44/emojify", as:command
+zplug "b4b4r07/emoji-cli"
 
 # zsh-syntax-highlight
 zplug "zsh-users/zsh-syntax-highlighting", nice:10, hook-load: "ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'"
@@ -23,3 +24,6 @@ zplug "rike422/git-wip", if: "which hub"
 
 # git
 zplug "rimraf/k"
+
+# shell commands (specify export directory path using `of` specifier)
+zplug "b4b4r07/http_code", as:command, of:bin
