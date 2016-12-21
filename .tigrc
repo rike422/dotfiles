@@ -14,14 +14,15 @@ set diff-context = 6
 # # *color* 'area' 'fgcolor' 'bgcolor' '[attributes]'
 
 # 特定のコミットをチェックアウト
-bind main C !?git checkout %(commit)↲
+bind main C !?git checkout %(commit)
 
 ########
 # branch view
 ########
 
 # リモートブランチをtrackしつつチェックアウト
-bind branch T !git checkout -t %(branch)
+bind branch T !git checkout -t %(branch) 
+
 # カーソル行のブランチを親にして入力した名前のブランチを作成
 bind branch n !git checkout -b %(prompt) %(branch)
 # 不要になったブランチを削除（squash mergeや別リポジトリへのmergeをするワークフロー用）
