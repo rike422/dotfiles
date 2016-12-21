@@ -26,4 +26,4 @@ zplug "rike422/git-wip", if: "which hub"
 zplug "rimraf/k"
 
 # shell commands (specify export directory path using `of` specifier)
-zplug "b4b4r07/http_code", as:command, of:bin
+zplug "b4b4r07/http_code", as:command, use:bin
