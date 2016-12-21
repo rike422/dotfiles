@@ -6,7 +6,7 @@ zplug "mrowa44/emojify", as:command
 zplug "b4b4r07/emoji-cli"
 
 # zsh-syntax-highlight
-zplug "zsh-users/zsh-syntax-highlighting", nice:10, hook-load: "ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'"
+zplug "zsh-users/zsh-syntax-highlighting", defer:3, hook-load: "ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'"
 
 # インタラクティブフィルタ
 zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
