@@ -31,9 +31,3 @@ alias npn="npm-popute"
 alias g='git'
 
 ### Commnads ###
-
-# current time
-function now() {
-  UNIXTIME=$(curl -s "http://www.convert-unix-time.com/api?timestamp=now&timezone=tokyo" | jq .timestamp)
-  date -r $UNIXTIME +%Y/%m/%d\(%a\)\ %H:%M
-}
