@@ -45,6 +45,7 @@ if [ `uname` = "Linux" ]; then
     jq \
     w3m \
     curl \
+    ngrep\
     unzip \
     apcalc \
     source-highlight \
@@ -72,6 +73,7 @@ elif [ `uname` = "Darwin" ]; then
   rmtrash \
   wget \
   nkf \
+  ngrep \
   ssh-copy-id \
   reattach-to-user-namespace \
   jq \
