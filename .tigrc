@@ -40,6 +40,10 @@ bind generic - !@hub browse -- issues
 # 選択したcommitをGitHubで表示
 bind generic ~ !@hub browse -- commit/%(commit)
 
+# 選択したコミットが含まれるプルリクエストへジャンプ
+# http://hisaichi5518.hatenablog.jp/entry/2017/02/09/160007
+bind generic P @sh -c 'hub browse -- commit/%(commit)'
+
 # 選択したcommitのci-statusを確認
 bind generic = !hub ci-status %(commit)
 
