@@ -172,7 +172,7 @@ fi
 if [ -f $DOTFILES/pkg/nodebrew/nodebrew ]; then
   export NODEBREW_ROOT=$DOTFILES/pkg/nodebrew
   export PATH=$NODEBREW_ROOT/current/bin:$PATH
-  nodebrew use v6
+  # nodebrew use v6
   . <(npm completion)
   alias npmls="npm ls --depth 0"
   export PATH=$DOTFILES/node_modules/.bin:$PATH
