@@ -51,6 +51,8 @@ if [ `uname` = "Linux" ]; then
     source-highlight \
     ctags \
     zopfli \
+    git \
+    tig \
     nkf
 
   else
@@ -69,6 +71,7 @@ elif [ `uname` = "Darwin" ]; then
   tree \
   zsh \
   git \
+  tig \
   vim \
   rmtrash \
   wget \
