@@ -150,6 +150,7 @@ fi
 
 if [ -d "$DOTFILES/pkg/rust" ]; then
   source $HOME/.cargo/env
+  source $HOME/.cargo/bin
 fi
 
 # golang
