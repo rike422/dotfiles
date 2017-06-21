@@ -186,6 +186,11 @@ if [ -d "$DOTFILES/pkg/hub/bin"  ]; then
   eval "$(hub alias -s)"
 fi
 
+# Java-SDKMan
+if [ -d "$DOTFILES/pkg/sdkman/bin"  ]; then
+  export SDKMAN_DIR=$DOTFILES/pkg/sdkman
+  source "${DOTFILES}/pkg/sdkman/bin/sdkman-init.sh"
+fi
 ###
 # exports (homebrew)
 ###
