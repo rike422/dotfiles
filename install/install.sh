@@ -7,6 +7,8 @@ echo "alias ls='ls -la --col'" >> ~/.bashrc
 export DOTFILES=`dirname $0`/..
 echo DOTFILES=$DOTFILES
 
+
+
 ###################
 # distoribute
 ###################
@@ -66,6 +68,13 @@ if [ `uname` = "Linux" ]; then
     sudo yum install -y git gcc-c++ openssl-devel make
   fi
 elif [ `uname` = "Darwin" ]; then
+  # install gibo
+  $DOTFILES/install/ruby.sh
+  # install homebrew
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  # install homebrew-cask
+  brew tap caskroom/cask
+
   brew install \
   tmux \
   tree \
@@ -84,14 +93,46 @@ elif [ `uname` = "Darwin" ]; then
   w3m \
   calc \
   source-highlight \
+  alfred \
   ctags \
+  mas \
   zopfli
+
+  # auth
+  brew cask install \
+  authy-desktop \
+
+  # utility
+  brew cask install \
+  dropbox \
+  alfred \
+  skype \
+  google-drive \
+  licecap \
+
+  # dev tools
+  brew cask install \
+  iterm2 \
+  virtualbox \
+  vagrant \
+  intellij-idea \
+  atom \
+  sketch
+
+  # browsers
+  brew cask install \
+  firefox \
+  google-chrome \
+  vivaldi
 
   # Change default PATH order in mac for homebrew
   if ! diff /etc/paths $DOTFILES/misc/mac.paths >/dev/null ; then
     sudo mv /etc/paths /etc/paths.orig
     sudo cp $DOTFILES/misc/mac.paths /etc/paths
   fi
+
+  # install application from app store
+  $DOTFILES/install/install-appstore.sh
 fi
 
 # install tmux v2
