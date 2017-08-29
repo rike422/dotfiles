@@ -4,10 +4,8 @@
 ###################
 echo "alias ls='ls -la --col'" >> ~/.bashrc
 
-export DOTFILES=`dirname $0`/..
+export DOTFILES=$(cd $(dirname $0); cd ../; pwd)
 echo DOTFILES=$DOTFILES
-
-
 
 ###################
 # distoribute
