@@ -68,8 +68,8 @@ if [ `uname` = "Linux" ]; then
     sudo yum install -y git gcc-c++ openssl-devel make
   fi
 elif [ `uname` = "Darwin" ]; then
-  # install gibo
-  $DOTFILES/install/ruby.sh
+  # install ruby
+  $DOTFILES/install/install-ruby.sh
   # install homebrew
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   # install homebrew-cask
@@ -138,8 +138,9 @@ fi
 
 # install tmux v2
 $DOTFILES/install/install-tmux2.sh
-# install gibo
-$DOTFILES/install/zplug.sh
+
+# install zplug
+$DOTFILES/install/install-zplug.sh
 
 # link dotfiles to home
 $DOTFILES/bin/slink.sh
