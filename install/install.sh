@@ -107,7 +107,8 @@ elif [ `uname` = "Darwin" ]; then
   dropbox \
   alfred \
   skype \
-  google-drive \
+  google-backup-and-sync \
+  google-japanese-ime \
   licecap \
 
   # dev tools
