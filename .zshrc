@@ -157,7 +157,8 @@ fi
 if [ -d "$DOTFILES/pkg/goenv/bin" ]; then
   export GOENV_ROOT="$DOTFILES/pkg/goenv"
   export GOROOT=$DOTFILES/pkg/goenv/current
-  export PATH="$GOENV_ROOT/bin:$PATH"
+  export GOPATH=$HOME/dev
+  export PATH="$GOENV_ROOT/bin:$GOPATH/bin:$PATH"
   eval "$(goenv init -)"
 fi
 
