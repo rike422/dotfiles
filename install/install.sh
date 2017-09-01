@@ -72,6 +72,7 @@ elif [ `uname` = "Darwin" ]; then
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   # install homebrew-cask
   brew tap caskroom/cask
+  brew tap caskroom/versions
 
   brew install \
   tmux \
@@ -99,23 +100,28 @@ elif [ `uname` = "Darwin" ]; then
   # auth
   brew cask install \
   authy-desktop \
+  lastpass
 
   # utility
   brew cask install \
   dropbox \
   alfred \
   skype \
+  karabiner-elements \
+  slack-beta \
   google-backup-and-sync \
   google-japanese-ime \
-  licecap \
+  licecap
 
   # dev tools
   brew cask install \
+  docker \
   iterm2 \
   virtualbox \
   vagrant \
   intellij-idea \
   atom \
+  visual-studio-code \
   sketch
 
   # browsers
