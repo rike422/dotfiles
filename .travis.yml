@@ -8,3 +8,4 @@ env:
     - DOTPATH=~/.dotfiles
 install:
     - install/install.sh
+sudo: required
