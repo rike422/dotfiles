@@ -4,3 +4,4 @@
 *.iml
 .ideaDataSources
 .DS_Store
+atlassian-ide-plugin.xml
