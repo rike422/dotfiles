@@ -153,6 +153,13 @@ if [ -d "$DOTFILES/pkg/rust" ]; then
   source $HOME/.cargo/bin
 fi
 
+# evm
+if [ -d "$DOTFILES/pkg/evm" ]; then
+  export EVM_HOME="$DOTFILES/pkg/evm"
+  source $EVM_HOME/scripts/evm
+fi
+
+
 # golang
 if [ -d "$DOTFILES/pkg/goenv/bin" ]; then
   export GOENV_ROOT="$DOTFILES/pkg/goenv"
