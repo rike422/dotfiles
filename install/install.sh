@@ -140,8 +140,6 @@ elif [ `uname` = "Darwin" ]; then
   $DOTFILES/install/install-appstore.sh
 fi
 
-# install tmux v2
-$DOTFILES/install/install-tmux2.sh
 
 # install zplug
 $DOTFILES/install/install-zplug.sh
