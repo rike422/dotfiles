@@ -29,5 +29,7 @@ alias less="less -R"
 alias npn="npm-popute"
 
 alias g='git'
+alias md='cd $(ghq root)/$(ghq list | peco)'
+alias gho='hub browse $(ghq list | peco | cut -d "/" -f 2,3)'
 
 ### Commnads ###

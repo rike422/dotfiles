@@ -2,6 +2,7 @@
 *.ipr
 *.iws
 *.iml
+.idea
 .ideaDataSources
 .DS_Store
 atlassian-ide-plugin.xml

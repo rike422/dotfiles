@@ -2,6 +2,7 @@
 # intall goenv
 ###################
 
+DOTFILES=$HOME/dotfiles
 DEST=$DOTFILES/pkg/goenv
 GOENV_ROOT=$DOTFILES/pkg/goenv
 rm -rf $DEST

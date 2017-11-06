@@ -198,8 +198,17 @@ fi
 # Java-SDKMan
 if [ -d "$DOTFILES/pkg/sdkman/bin"  ]; then
   export SDKMAN_DIR=$DOTFILES/pkg/sdkman
+  export JAVA_HOME=$DOTFILES/pkg/sdkman/candidates/current
   source "${DOTFILES}/pkg/sdkman/bin/sdkman-init.sh"
 fi
+
+# export bin
+[ -d "$DOTFILES/local/openssl/bin" ] && export PATH=$DOTFILES/local/openssl/bin:$PATH
+[ -d "$DOTFILES/local/tmux" ]        && export PATH=$DOTFILES/local/tmux/bin:$PATH
+[ -d "$DOTFILES/pkg/peco" ]          && export PATH=$DOTFILES/pkg/peco:$PATH
+[ -d "$DOTFILES/pkg/ghq" ]           && export PATH=$DOTFILES/pkg/ghq:$PATH
+[ -d "$DOTFILES/bin" ]               && export PATH=$DOTFILES/bin:$PATH
+
 ###
 # exports (homebrew)
 ###

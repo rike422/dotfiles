@@ -2,6 +2,8 @@
 # intall ruby
 ###################
 
+DOTFILES=$HOME/dotfiles
+
 if [ `uname` = "Linux" ]; then
   if uname -a | grep ubuntu -i >/dev/null; then
     #########

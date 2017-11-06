@@ -67,12 +67,17 @@ if [ `uname` = "Linux" ]; then
   fi
 elif [ `uname` = "Darwin" ]; then
   # install ruby
+    # install homebrew-cask
+  brew tap caskroom/cask
+  brew tap caskroom/versions
+
+  brew install \
+  cmake \
+  gcc
+
   $DOTFILES/install/install-ruby.sh
   # install homebrew
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  # install homebrew-cask
-  brew tap caskroom/cask
-  brew tap caskroom/versions
 
   brew install \
   tmux \
@@ -92,14 +97,14 @@ elif [ `uname` = "Darwin" ]; then
   w3m \
   calc \
   source-highlight \
-  alfred \
+  # alfred \
   ctags \
   mas \
   zopfli
 
   # auth
   brew cask install \
-  authy-desktop \
+  authy \
   lastpass
 
   # utility
@@ -107,7 +112,7 @@ elif [ `uname` = "Darwin" ]; then
   dropbox \
   alfred \
   skype \
-  karabiner-elements \
+  # karabiner-elements \
   slack-beta \
   google-backup-and-sync \
   google-japanese-ime \
@@ -117,7 +122,7 @@ elif [ `uname` = "Darwin" ]; then
   brew cask install \
   docker \
   iterm2 \
-  virtualbox \
+  # virtualbox \
   vagrant \
   intellij-idea \
   atom \

@@ -26,19 +26,20 @@ url = `curl -L #{releases} | jq '.assets | .[] | .browser_download_url' | grep #
 puts "\nTARGET URL: #{url}\n\n"
 
 archive = url.split('/').pop
-extension = archive.match('tar.gz') || archive.match('tgz')
-puts extension
+file = File.basename(archive, ".*")
 
 `curl -L #{url} --output /tmp/#{archive}`
-puts "\nSAVE TO: /tmp/#{archive}\n\n"
-if extension.nil?
-  file = archive.delete('.').shift
+puts "\nSAVE TO: /tmp#{archive}\n\n"
+
+if archive.match('tar.gz') || archive.match('tgz')
+  p archive
+  p file
+  `tar zxf /tmp/#{archive} -C /tmp`
+else
   `mkdir /tmp/#{file}`
   `unzip -j /tmp/#{archive} -d /tmp/#{file}`
-else
-  file = archive.sub(".#{extension[0]}", '')
-  `tar zxf /tmp/#{archive} -C /tmp`
 end
 
 `mv /tmp/#{file} $DOTFILES/pkg/#{repo}`
 puts "\nMOVE TO: $DOTFILES/pkg/#{repo}\n\n"
+
