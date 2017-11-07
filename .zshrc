@@ -8,8 +8,26 @@ export LANG=ja_JP.UTF-8  # 文字コードをUTF-8に設定
 export KCODE=u           # KCODEにUTF-8を設定
 export AUTOFEATURE=true  # autotestでfeatureを動かす
 
-bindkey -e               # キーバインドをemacsモードに設定
-#bindkey -v              # キーバインドをviモードに設定
+# bindkey -e             # キーバインドをemacsモードに設定
+bindkey -v               # キーバインドをviモードに設定
+
+bindkey -M viins '\er' history-incremental-pattern-search-forward
+bindkey -M viins '^?'  backward-delete-char
+bindkey -M viins '^A'  beginning-of-line
+bindkey -M viins '^B'  backward-char
+bindkey -M viins '^D'  delete-char-or-list
+bindkey -M viins '^E'  end-of-line
+bindkey -M viins '^F'  forward-char
+bindkey -M viins '^G'  send-break
+bindkey -M viins '^H'  backward-delete-char
+bindkey -M viins '^K'  kill-line
+bindkey -M viins '^N'  down-line-or-history
+bindkey -M viins '^P'  up-line-or-history
+bindkey -M viins '^R'  history-incremental-pattern-search-backward
+bindkey -M viins '^U'  backward-kill-line
+bindkey -M viins '^W'  backward-kill-word
+bindkey -M viins '^Y'  yank
+
 
 setopt no_beep           # ビープ音を鳴らさないようにする
 setopt auto_cd           # ディレクトリ名の入力のみで移動する
@@ -130,10 +148,11 @@ bindkey "^[^h" cheat-sheet
 [ -f $DOTFILES/zsh/plugins.zsh ] && source $DOTFILES/zsh/plugins.zsh
 [ -f $DOTFILES/zsh/common.zsh ] && source $DOTFILES/zsh/common.zsh
 [ -f $DOTFILES/zsh/auto_complete.zsh ] && source $DOTFILES/zsh/auto_complete.zsh
-[ -f $DOTFILES/zsh/show_branch.zsh ] && source $DOTFILES/zsh/show_branch.zsh
 [ -f $DOTFILES/zsh/peco.zsh ] && source $DOTFILES/zsh/peco.zsh
+[ -f $DOTFILES/zsh/prompt.zsh ] && source $DOTFILES/zsh/prompt.zsh
 
 # include localfile
+[ -f $DOTFILES/local/zsh/local.zsh ] && source $DOTFILES/local/zsh/local.zsh
 [ -f $DOTFILES/local/zsh/alias.zsh ] && source $DOTFILES/local/zsh/alias.zsh
 
 zplug load --verbose
