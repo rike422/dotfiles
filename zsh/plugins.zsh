@@ -6,7 +6,8 @@ zplug "mrowa44/emojify", as:command
 zplug "b4b4r07/emoji-cli"
 
 # zsh-syntax-highlight
-zplug "zsh-users/zsh-syntax-highlighting", defer:3, hook-load: "ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'"
+zplug "zsh-users/zsh-syntax-highlighting", defer:2, hook-load: "ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'"
+zplug "b4b4r07/zsh-vimode-visual", defer:3
 
 # インタラクティブフィルタ
 zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf
@@ -17,6 +18,7 @@ zplug "b4b4r07/zsh-gomi", if:"which fzf"
 
 # 移動
 zplug "b4b4r07/enhancd", use:init.sh
+zplug "b4b4r07/zsh-vimode-visual"
 
 # myplguin
 zplug "rike422/git-tmp"
