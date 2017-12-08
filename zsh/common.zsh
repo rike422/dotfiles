@@ -33,8 +33,8 @@ alias gho='hub browse $(ghq list | peco | cut -d "/" -f 2,3)'
 
 # js
 
-alias npm="n"
-alias yarn="y"
+alias n="npm"
+alias y="yarn"
 alias nr="npm run"
 
 # ruby
