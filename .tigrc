@@ -10,6 +10,10 @@ set main-view = id date author commit-title:graph=yes,refs=yes
 
 # 差分の前後の表示行数（diff-context)を指定
 set diff-context = 6
+
+# diff highlightを使用する
+set diff-highlight = true
+
 # vim: set expandtab sw=4 tabstop=4:
 # # *color* 'area' 'fgcolor' 'bgcolor' '[attributes]'
 

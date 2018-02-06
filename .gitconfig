@@ -1,5 +1,9 @@
 [include]
   path = ~/.gitconfig_local
+[pager]
+  log = diff-highlight | less
+  show = diff-highlight | less
+  diff = diff-highlight | less
 [color]
   ui = auto
   diff = auto
@@ -38,7 +42,7 @@
   us = reset HEAD
   # discard modified changes
   dm = checkout .
-  pc = !git push origin `git rev-parse --abbrev-ref HEAD`
+  pc = push origin HEAD
   # discard all changes made (including removing untracked files)
   discardall = !git clean -df && git checkout .
   # Commit all changes
@@ -56,7 +60,7 @@
   # Undo a `git push`
   undopush = push -f origin HEAD^:master
 
-  pcf = !zsh -c 'git push -f origin $(git rev-parse --abbrev-ref HEAD 2> /dev/null)'  # Various other shorthands
+  pcf = !zsh -c 'git push -f origin HEAD'  # Various other shorthands
 
   st = status
   ci = commit
@@ -79,3 +83,5 @@
   useConfigOnly = true
 [ghq]
   root = ~/dev
+[fetch]
+    prune = true
