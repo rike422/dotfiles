@@ -10,3 +10,4 @@ pkg/*
 !pkg/.gitkeep
 local/*
 !local/.gitkeep
+.envrc

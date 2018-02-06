@@ -221,6 +221,10 @@ if [ -d "$DOTFILES/pkg/sdkman/bin"  ]; then
   source "${DOTFILES}/pkg/sdkman/bin/sdkman-init.sh"
 fi
 
+if [ -d "$DOTFILES/pkg/direnv/bin"  ]; then
+  eval "$(direnv hook zsh)"
+fi
+
 # export bin
 [ -d "$DOTFILES/local/openssl/bin" ] && export PATH=$DOTFILES/local/openssl/bin:$PATH
 [ -d "$DOTFILES/local/tmux" ]        && export PATH=$DOTFILES/local/tmux/bin:$PATH
