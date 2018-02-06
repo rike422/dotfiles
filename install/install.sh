@@ -144,6 +144,9 @@ elif [ `uname` = "Darwin" ]; then
   # install application from app store
   $DOTFILES/install/install-appstore.sh
 fi
+ 
+# install diff-highlight
+$DOTFILES/install/install-diff-highlight.sh
 
 
 # install zplug
