@@ -221,7 +221,7 @@ if [ -d "$DOTFILES/pkg/sdkman/bin"  ]; then
   source "${DOTFILES}/pkg/sdkman/bin/sdkman-init.sh"
 fi
 
-if [ -d "$DOTFILES/pkg/direnv/bin"  ]; then
+if [ -x "$(command -v direnv)" ]; then
   eval "$(direnv hook zsh)"
 fi
 
