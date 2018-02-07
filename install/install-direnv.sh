@@ -8,4 +8,5 @@ if [ ! -d "$DOTFILES/pkg/goenv/bin" ]; then
 fi
 DEST=$DOTFILES/pkg/direnv
 
-go get http://github.com/zimbatm/direnv
+go get github.com/direnv/direnv
+
