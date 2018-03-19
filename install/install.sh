@@ -122,7 +122,6 @@ elif [ `uname` = "Darwin" ]; then
   brew cask install \
   docker \
   iterm2 \
-  # virtualbox \
   vagrant \
   intellij-idea \
   atom \
@@ -135,6 +134,13 @@ elif [ `uname` = "Darwin" ]; then
   google-chrome \
   vivaldi
 
+  # ios app develop tools
+  brew install --HEAD libimobiledevice
+  brew install ios-deploy ideviceinstaller cocoapods
+  
+  # android app develop tools
+  brew cask install android-studio
+  
   # Change default PATH order in mac for homebrew
   if ! diff /etc/paths $DOTFILES/misc/mac.paths >/dev/null ; then
     sudo mv /etc/paths /etc/paths.orig

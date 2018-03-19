@@ -230,6 +230,7 @@ fi
 [ -d "$DOTFILES/local/tmux" ]        && export PATH=$DOTFILES/local/tmux/bin:$PATH
 [ -d "$DOTFILES/pkg/peco" ]          && export PATH=$DOTFILES/pkg/peco:$PATH
 [ -d "$DOTFILES/pkg/ghq" ]           && export PATH=$DOTFILES/pkg/ghq:$PATH
+[ -d "$DOTFILES/pkg/flutter" ]       && export PATH=$DOTFILES/pkg/flutter/bin:$PATH
 [ -d "$DOTFILES/bin" ]               && export PATH=$DOTFILES/bin:$PATH
 
 ###
