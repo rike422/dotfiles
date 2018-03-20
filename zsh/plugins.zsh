@@ -1,5 +1,10 @@
 # 補完キーワード強化
 zplug "zsh-users/zsh-completions"
+zplug "plugins/aws", from:oh-my-zsh
+zplug "plugins/gitfast", from:oh-my-zsh
+zplug "plugins/brew", from:oh-my-zsh
+zplug "plugins/docker-compose", from:oh-my-zsh
+
 
 # 絵文字
 zplug "mrowa44/emojify", as:command
