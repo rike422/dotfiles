@@ -45,3 +45,7 @@ alias berc="bundle exec rails c"
 alias beg="bundle exec guard"
 
 ### Commnads ###
+
+get_github_latest_release() {
+   curl -s "https://api.github.com/repos/$1/$2/releases/latest" | jq -r ".assets[] | select(.name | test(\"$3\")) | .browser_download_url"
+}

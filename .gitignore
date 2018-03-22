@@ -11,3 +11,6 @@ pkg/*
 local/*
 !local/.gitkeep
 .envrc
+
+bin/aws
+bin/protoc
