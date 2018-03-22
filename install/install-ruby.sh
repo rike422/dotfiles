@@ -4,17 +4,17 @@
 
 DOTFILES=$HOME/dotfiles
 
-if [ `uname` = "Linux" ]; then
-  if uname -a | grep ubuntu -i >/dev/null; then
-    #########
-    # ubuntu
-    #########
-    sudo apt-get install -y \
-    sqlite3 \
-    libsqlite3-dev \
-    mysql-client \
-    libmysqlclient-dev
-  fi
+if [ $(uname) = "Linux" ]; then
+	if uname -a | grep ubuntu -i >/dev/null; then
+		#########
+		# ubuntu
+		#########
+		sudo apt-get install -y \
+			sqlite3 \
+			libsqlite3-dev \
+			mysql-client \
+			libmysqlclient-dev
+	fi
 fi
 
 DEST=$DOTFILES/pkg/rbenv
@@ -35,5 +35,5 @@ git clone https://github.com/rbenv/rbenv-default-gems.git $DEST/plugins/rbenv-de
 # install rbenv default-gems
 ln -s $DOTFILES/misc/rbenv/default-gems $DEST
 
-$DEST/bin/rbenv install  2.4.1
-$DEST/bin/rbenv global  2.4.1
+$DEST/bin/rbenv install 2.4.1
+$DEST/bin/rbenv global 2.4.1
