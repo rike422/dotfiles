@@ -56,13 +56,14 @@ set vertical-split = no
 # general
 # color   default                 15      235
 color   cursor                  15      241
-color   title-focus             242     221
-color   title-blur              242     221
+color   title-focus             blue    221 bold
+color   title-blur              blue    221 bold
 color   delimiter               213     default
 color   author                  156     default
 color   date                    81      default
 color   line-number             221     default
 color   mode                    255     default
+color   help-group              81      default
 
 # main
 color   main-tag                213     default     bold
