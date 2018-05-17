@@ -89,4 +89,6 @@
 [ghq]
   root = ~/dev
 [fetch]
-    prune = true
+  prune = true
+[hub]
+  protocol = https
