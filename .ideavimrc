@@ -4,5 +4,4 @@ source ~/.vimrc
 map <C-f> :action AceAction<CR>
 " Press `F` to activate Target Mode
 map <C-F> :action AceTargetAction<CR>
-" Press `g` to activate Line Mode
-map g :action AceLineAction<CR>
+
