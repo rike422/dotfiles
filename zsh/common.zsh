@@ -31,6 +31,12 @@ alias g='git'
 alias md='cd $(ghq root)/$(ghq list | peco)'
 alias gho='hub browse $(ghq list | peco | cut -d "/" -f 2,3)'
 
+# apps
+alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+alias chrome-canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
+alias chromium="/Applications/Chromium.app/Contents/MacOS/Chromium"
+
+
 # js
 
 alias n="npm"
