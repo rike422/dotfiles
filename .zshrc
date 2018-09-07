@@ -172,6 +172,13 @@ if [ -d "$DOTFILES/pkg/rust" ]; then
   source $HOME/.cargo/bin
 fi
 
+# Java-SDKMan
+if [ -d "$DOTFILES/pkg/sdkman/bin"  ]; then
+  export SDKMAN_DIR=$DOTFILES/pkg/sdkman
+  export JAVA_HOME=$DOTFILES/pkg/sdkman/candidates/current
+  source "${DOTFILES}/pkg/sdkman/bin/sdkman-init.sh"
+fi
+
 # evm
 if [ -d "$DOTFILES/pkg/evm" ]; then
   export EVM_HOME="$DOTFILES/pkg/evm"
@@ -197,6 +204,12 @@ if [ -d "$DOTFILES/pkg/rbenv/bin" ]; then
   rbenv global 2.4.1
 fi
 
+# hub
+if [ -d "$DOTFILES/pkg/hub/bin"  ]; then
+  export PATH=$DOTFILES/pkg/hub/bin:$PATH
+  eval "$(hub alias -s)"
+fi
+
 # nodebrew
 if [ -f $DOTFILES/pkg/nodebrew/nodebrew ]; then
   export NODEBREW_ROOT=$DOTFILES/pkg/nodebrew
@@ -208,18 +221,6 @@ if [ -f $DOTFILES/pkg/nodebrew/nodebrew ]; then
   export PATH=./node_modules/.bin:$PATH
 fi
 
-# hub
-if [ -d "$DOTFILES/pkg/hub/bin"  ]; then
-  export PATH=$DOTFILES/pkg/hub/bin:$PATH
-  eval "$(hub alias -s)"
-fi
-
-# Java-SDKMan
-if [ -d "$DOTFILES/pkg/sdkman/bin"  ]; then
-  export SDKMAN_DIR=$DOTFILES/pkg/sdkman
-  export JAVA_HOME=$DOTFILES/pkg/sdkman/candidates/current
-  source "${DOTFILES}/pkg/sdkman/bin/sdkman-init.sh"
-fi
 
 if [ -x "$(command -v direnv)" ]; then
   eval "$(direnv hook zsh)"
