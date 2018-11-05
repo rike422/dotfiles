@@ -1,6 +1,6 @@
 TMP_DIR=/tmp/protobuf-rules-gen
 TMP_FILE=/tmp/protobuf-rules-gen
-DEST=$DOTFILES/bin/protobuf-rules-gen
+DEST=$DOTFILES/local/bin/protobuf-rules-gen
 
 if [ $(uname) = "Linux" ]; then
 	PLATFORM='linux-x86_64'

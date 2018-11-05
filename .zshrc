@@ -161,6 +161,7 @@ zplug load --verbose
 # -----------------------------
 
 [ -d "$DOTFILES/bin" ] && export PATH=$DOTFILES/bin:$PATH
+[ -d "$DOTFILES/local/bin" ] && export PATH=$DOTFILES/local/bin:$PATH
 
 #zsh-completions
 if [ -e /usr/local/share/zsh-completions ]; then

@@ -1,6 +1,6 @@
 TMP_DIR=/tmp/protobuf
 TMP_FILE=/tmp/protobuf.zip
-DEST=$DOTFILES/bin/protoc
+DEST=$DOTFILES/local/bin/protoc
 
 if [ $(uname) = "Linux" ]; then
 	PLATFORM='linux-x86_64'
