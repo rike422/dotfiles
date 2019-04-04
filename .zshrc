@@ -227,6 +227,10 @@ if [ -x "$(command -v direnv)" ]; then
   eval "$(direnv hook zsh)"
 fi
 
+if [ -x "$(command -v docker)" ]; then
+  export DOCKER_BUILDKIT=1
+fi
+
 # export bin
 [ -d "$DOTFILES/local/openssl/bin" ] && export PATH=$DOTFILES/local/openssl/bin:$PATH
 [ -d "$DOTFILES/local/tmux" ]        && export PATH=$DOTFILES/local/tmux/bin:$PATH
@@ -243,3 +247,4 @@ if [ `uname` = "Darwin" ]; then
     export PGDATA=/usr/local/var/postgres
   fi
 fi
+export PATH="/usr/local/opt/mysql@5.6/bin:$PATH"
