@@ -96,12 +96,13 @@ elif [ $(uname) = "Darwin" ]; then
 		ssh-copy-id \
 		reattach-to-user-namespace \
 		jq \
+		jo \
 		pt \
 		w3m \
 		calc \
 		source-highlight
-	# alfred \
-	ctags \
+		# alfred \
+		ctags \
 		mas \
 		zopfli
 
@@ -114,9 +115,9 @@ elif [ $(uname) = "Darwin" ]; then
 	brew cask install \
 		dropbox \
 		alfred \
-		skype
+		skype \
 	# karabiner-elements \
-	slack-beta \
+		slack-beta \
 		google-backup-and-sync \
 		google-japanese-ime \
 		licecap
@@ -126,7 +127,7 @@ elif [ $(uname) = "Darwin" ]; then
 		docker \
 		iterm2 \
 		vagrant \
-		intellij-idea \
+		jetbrains-toolbox \
 		atom \
 		visual-studio-code \
 		sketch
@@ -134,8 +135,7 @@ elif [ $(uname) = "Darwin" ]; then
 	# browsers
 	brew cask install \
 		firefox \
-		google-chrome \
-		vivaldi
+		google-chrome
 
 	# ios app develop tools
 	brew install --HEAD libimobiledevice
