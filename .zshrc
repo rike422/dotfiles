@@ -141,6 +141,12 @@ cheat-sheet () { zle -M "`cat ~/zsh/cheat-sheet.conf`" }
 zle -N cheat-sheet
 bindkey "^[^h" cheat-sheet
 
+
+if [ -s $HOME/.xkb/keymap/mykbd ]
+then
+    sleep 1
+    xkbcomp -I$HOME/.xkb $HOME/.xkb/keymap/mykbd $DISPLAY 2>/dev/null
+fi
 # -----------------------------
 # includes
 # -----------------------------
@@ -186,7 +192,6 @@ if [ -d "$DOTFILES/pkg/evm" ]; then
   source $EVM_HOME/scripts/evm
 fi
 
-
 # golang
 if [ -d "$DOTFILES/pkg/goenv/bin" ]; then
   export GOENV_ROOT="$DOTFILES/pkg/goenv"
@@ -202,7 +207,7 @@ if [ -d "$DOTFILES/pkg/rbenv/bin" ]; then
   export RBENV_ROOT=$DOTFILES/pkg/rbenv
   export PATH=$RBENV_ROOT/bin:$PATH
   eval "$(rbenv init -)"
-  rbenv global 2.4.1
+  rbenv global 2.6.2
 fi
 
 # hub
