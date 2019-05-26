@@ -18,7 +18,7 @@
   newHighlight = "green white bold 22"
 [core]
   excludesfile = ~/.gitignore_global
-  editor = /usr/local/bin/vim
+  editor = $(which vim)
 [pull]
   rebase = true
 [alias]
