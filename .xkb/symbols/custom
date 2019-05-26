@@ -1,0 +1,14 @@
+xkb_symbols "jpus" {
+  replace key <AE13> { [ backslash, bar ] };
+  replace key <AC12> { [ Return ] };
+};
+
+xkb_symbols "ctrl" {
+  replace key <CAPS> { [ Control_L ] };
+  modifier_map Control { <CAPS> };
+};
+
+xkb_symbols "kana" {
+  replace key <NFER> { [ Muhenkan ] };
+  replace key <XFER> { [ Henkan ] };
+};
