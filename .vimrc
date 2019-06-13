@@ -17,6 +17,9 @@ set expandtab
 set tabstop=2
 set shiftwidth=2
 set helplang=en
+map <leader>y "*y
+map <leader>p "*p
+set clipboard+=unnamed
 
 set backspace=indent,eol,start
 nnoremap <Space>w  :<C-u>w<CR>

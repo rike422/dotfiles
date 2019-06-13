@@ -5,3 +5,89 @@ map <C-f> :action AceAction<CR>
 " Press `F` to activate Target Mode
 map <C-F> :action AceTargetAction<CR>
 
+"検索をファイルの先頭へ循環しない
+set nowrapscan
+ 
+"大文字小文字の区別なし
+set ignorecase
+ 
+"検索時に大文字を含んでいたら大/小を区別
+set smartcase
+ 
+"検索対象をハイライト
+"ハイライトを消す場合は:noh[l]
+set hlsearch
+ 
+"スクロール時に表示を10行確保
+set scrolloff=10
+
+"x キー削除でデフォルトレジスタに入れない
+nnoremap x "_x
+vnoremap x "_x
+nnoremap s "_s
+vnoremap s "_s
+
+"vv で行末まで選択
+vnoremap v ^$h
+ 
+"選択範囲のインデントを連続して変更
+vnoremap < <gv
+vnoremap > >gv
+ 
+"ノーマルモード中にEnterで改行
+noremap <CR> i<CR><Esc>
+ 
+"インサートモードで bash 風キーマップ
+inoremap <C-a> <C-o>^
+inoremap <C-e> <C-o>$<Right>
+inoremap <C-b> <Left>
+inoremap <C-f> <Right>
+inoremap <C-n> <Down>
+inoremap <C-p> <Up>
+inoremap <C-h> <BS>
+inoremap <C-d> <Del>
+inoremap <C-k> <C-o>D<Right>
+inoremap <C-u> <C-o>d^
+inoremap <C-w> <C-o>db
+
+" j, k による移動を折り返されたテキストでも自然に振る舞うように変更
+nnoremap j gj
+nnoremap k gk
+
+" vを二回で行末まで選択
+vnoremap v $h
+" TABにて対応ペアにジャンプ
+nnoremap &lt;Tab&gt; %
+vnoremap &lt;Tab&gt; %
+" 動作環境との統合
+" OSのクリップボードをレジスタ指定無しで Yank, Put 出来るようにする
+set clipboard=unnamed,unnamedplus
+"screen利用時設定
+set ttymouse=xterm2
+" マウスの入力を受け付ける
+set mouse=a
+" インサートモードから抜けると自動的にIMEをオフにする
+set iminsert=2
+
+"tab/indentの設定
+set shellslash
+set expandtab "タブ入力を複数の空白入力に置き換える
+set tabstop=2 "画面上でタブ文字が占める幅
+set shiftwidth=2 "自動インデントでずれる幅
+set softtabstop=2 "連続した空白に対してタブキーやバックスペースキーでカーソルが動く幅
+set autoindent "改行時に前の行のインデントを継続する
+set smartindent "改行時に入力された行の末尾に合わせて次の行のインデントを増減する
+"タブの設定
+" The prefix key.
+nnoremap    [Tag]   <Nop>
+nmap  t [Tag]
+" Tab jump
+" " tx タブを閉じる
+map <silent> [Tag]x :close<CR>
+map <silent> [Tag]c :close<CR>
+map <silent> [Tag]h gT
+map <silent> [Tag]l gt
+
+
+" 入力モード中に素早くJJと入力した場合はESCとみなす
+inoremap jj <Esc>
