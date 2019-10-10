@@ -5,7 +5,8 @@
 # ------------------------------
 export EDITOR=vim        # エディタをvimに設定
 export LANG=ja_JP.UTF-8  # 文字コードをUTF-8に設定
-export KCODE=u           # KCODEにUTF-8を設定
+export LC_TYPE=ja_JP.UTF-8
+export KCODE=utf-8       # KCODEにUTF-8を設定
 export AUTOFEATURE=true  # autotestでfeatureを動かす
 
 # bindkey -e             # キーバインドをemacsモードに設定
@@ -208,6 +209,14 @@ if [ -d "$DOTFILES/pkg/rbenv/bin" ]; then
   export PATH=$RBENV_ROOT/bin:$PATH
   eval "$(rbenv init -)"
   rbenv global 2.6.2
+fi
+
+# phpenv
+if [ -d "$DOTFILES/pkg/phpenv/bin" ]; then
+  export CONFIGURE_OPTS="--disable-install-doc"
+  export PHPENV_ROOT=$DOTFILES/pkg/phpenv
+  export PATH=$PHPENV_ROOT/bin:$PATH
+  eval "$(phpenv init -)"
 fi
 
 # hub
