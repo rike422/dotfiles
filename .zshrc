@@ -142,11 +142,20 @@ cheat-sheet () { zle -M "`cat ~/zsh/cheat-sheet.conf`" }
 zle -N cheat-sheet
 bindkey "^[^h" cheat-sheet
 
+# -----------------------------
+# Ubuntu
+# -----------------------------
 
-if [ -s $HOME/.xkb/keymap/mykbd ]
-then
-    sleep 1
-    xkbcomp -I$HOME/.xkb $HOME/.xkb/keymap/mykbd $DISPLAY 2>/dev/null
+if [ `uname` = "Linux" ]; then
+  source $DOTFILES/zsh/common_ubuntu.zsh
+
+  if [ -s $HOME/.xkb/keymap/mykbd ]
+  then
+      sleep 1
+      xkbcomp -I$HOME/.xkb $HOME/.xkb/keymap/mykbd $DISPLAY 2>/dev/null
+  fi
+  export WINIT_UNIX_BACKEND=x11 
+  
 fi
 # -----------------------------
 # includes
@@ -262,3 +271,5 @@ if [ `uname` = "Darwin" ]; then
   fi
 fi
 export PATH="/usr/local/opt/mysql@5.6/bin:$PATH"
+
+alias gsed="sed"
