@@ -92,3 +92,5 @@
   prune = true
 [hub]
   protocol = https
+[log]
+	follow = true
