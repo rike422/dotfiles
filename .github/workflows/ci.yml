@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - codex/**
+
+jobs:
+  validate:
+    name: validate (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    env:
+      CHEZMOI_OPTIONAL_SETUP: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure ~/.local/bin in PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Bash syntax check
+        run: |
+          bash -n scripts/bootstrap-chezmoi.sh \
+            scripts/import-codex.sh \
+            .chezmoiscripts/run_before_10_install_base_packages.sh.tmpl \
+            .chezmoiscripts/run_before_20_setup_shell.sh.tmpl \
+            install/install.sh \
+            bin/slink.sh \
+            bin/chsh.sh
+
+      - name: Zsh syntax check
+        run: zsh -n .zshrc .config/zsh/*.zsh
+
+      - name: Bootstrap dry-run
+        run: ./scripts/bootstrap-chezmoi.sh --source "$GITHUB_WORKSPACE" --dry-run
+
+      - name: Chezmoi verify
+        run: ./scripts/verify-chezmoi.sh "$GITHUB_WORKSPACE"
