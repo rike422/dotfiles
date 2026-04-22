@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi-bootstrap"
+MARKER_FILE="$STATE_DIR/shell-setup.done"
+OPTIONAL_SKIPPED=0
+
+log() {
+  printf '[chezmoi][shell] %s\n' "$*"
+}
+
+has_cmd() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+optional_mode_enabled() {
+  case "${CHEZMOI_OPTIONAL_SETUP:-0}" in
+    1|true|TRUE|yes|YES)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+skip_or_fail() {
+  local reason="$1"
+  if optional_mode_enabled; then
+    OPTIONAL_SKIPPED=1
+    log "optional-skip: $reason (CHEZMOI_OPTIONAL_SETUP=1)"
+    return 0
+  fi
+
+  log "error: $reason"
+  return 1
+}
+
+can_use_sudo_non_interactive() {
+  has_cmd sudo && sudo -n true >/dev/null 2>&1
+}
+
+get_login_shell() {
+  if [[ "$(uname -s)" == "Darwin" ]] && has_cmd dscl; then
+    dscl . -read "/Users/$USER" UserShell 2>/dev/null | awk '{print $2}'
+    return 0
+  fi
+
+  if has_cmd getent; then
+    getent passwd "$USER" | awk -F: '{print $7}'
+    return 0
+  fi
+
+  printf '%s\n' "${SHELL:-}"
+}
+
+ensure_shell_registered() {
+  local zsh_path="$1"
+
+  if grep -Fxq "$zsh_path" /etc/shells; then
+    return 0
+  fi
+
+  if [[ -w /etc/shells ]]; then
+    log "/etc/shells に $zsh_path を追加します"
+    printf '%s\n' "$zsh_path" >> /etc/shells
+    return 0
+  fi
+
+  if can_use_sudo_non_interactive; then
+    log "sudo で /etc/shells に $zsh_path を追加します"
+    printf '%s\n' "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+    return 0
+  fi
+
+  skip_or_fail "/etc/shells に書き込めないためシェル登録できません ($zsh_path)"
+}
+
+change_login_shell() {
+  local zsh_path="$1"
+
+  if [[ ! -t 0 ]] && [[ ! -t 1 ]]; then
+    skip_or_fail '非対話環境のためログインシェルを変更できません'
+    return $?
+  fi
+
+  if chsh -s "$zsh_path" "$USER" >/dev/null 2>&1; then
+    log "ログインシェルを $zsh_path に変更しました"
+    return 0
+  fi
+
+  if can_use_sudo_non_interactive && sudo chsh -s "$zsh_path" "$USER" >/dev/null 2>&1; then
+    log "sudo でログインシェルを $zsh_path に変更しました"
+    return 0
+  fi
+
+  skip_or_fail 'ログインシェルの変更に失敗しました。手動で chsh を実行してください'
+}
+
+setup_zplug() {
+  local zplug_home="$1"
+
+  if [[ -d "$zplug_home/.git" ]]; then
+    log "skip: zplug は既に初期化済み ($zplug_home)"
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$zplug_home")"
+
+  if [[ -d "$zplug_home" ]] && [[ ! -d "$zplug_home/.git" ]]; then
+    skip_or_fail "$zplug_home は存在しますが Git 管理ではないため zplug 初期化できません"
+    return $?
+  fi
+
+  if ! has_cmd git; then
+    skip_or_fail 'git が見つからないため zplug を初期化できません'
+    return $?
+  fi
+
+  log "zplug を初期化します: $zplug_home"
+  git clone --depth 1 https://github.com/zplug/zplug "$zplug_home"
+}
+
+finalize_marker() {
+  if [[ "$OPTIONAL_SKIPPED" -eq 1 ]]; then
+    log 'optional-skip が発生したため完了マーカーは作成しません'
+    return 0
+  fi
+
+  mkdir -p "$STATE_DIR"
+  date -u +%Y-%m-%dT%H:%M:%SZ > "$MARKER_FILE"
+  log "完了マーカーを作成しました: $MARKER_FILE"
+}
+
+main() {
+  local zsh_path
+  local current_shell
+  local zplug_home
+
+  if [[ -f "$MARKER_FILE" ]]; then
+    log "skip: 既に完了済みです ($MARKER_FILE)"
+    return 0
+  fi
+
+  if ! has_cmd zsh; then
+    skip_or_fail 'zsh が見つかりません。先に base package スクリプトを実行してください'
+    return $?
+  fi
+
+  zsh_path="$(command -v zsh)"
+  current_shell="$(get_login_shell)"
+  zplug_home="${ZPLUG_HOME:-$HOME/.zplug}"
+
+  ensure_shell_registered "$zsh_path"
+
+  if [[ "$current_shell" == "$zsh_path" ]]; then
+    log "skip: ログインシェルは既に $zsh_path です"
+  else
+    change_login_shell "$zsh_path"
+  fi
+
+  setup_zplug "$zplug_home"
+  finalize_marker
+}
+
+main "$@"

@@ -1,40 +1,66 @@
 # dotfiles
 
-このリポジトリは `chezmoi` source として利用できます。
-既存の dotfiles と `~/.codex`（rules/agents/skills など）を同じリポジトリで管理する想定です。
+このリポジトリは `chezmoi` を前提にした dotfiles source です。  
+旧 `install/*` 導線は廃止し、`chezmoi apply --source <source>` に統一します。
 
-## 1. 初回セットアップ
+## 運用方針
+
+- 適用は常に `source` を明示します（`$HOME/dotfiles` への symlink 前提は廃止）。
+- 初回セットアップは strict がデフォルトです（必須処理に失敗したら非0終了）。
+- 非対話/権限制約環境でのみ `CHEZMOI_OPTIONAL_SETUP=1` を使って skip を許可します。
+- optional-skip が発生した場合は完了マーカーを作らず、次回 `chezmoi apply` で再試行します。
+- zsh 拡張は `~/.config/zsh` 配下へ寄せる方針です。`zsh/` ディレクトリは現時点で apply 対象外のレガシー資材として扱います。
+
+## セットアップ
 
 ```bash
-# chezmoi インストール
-sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin
+# 推奨: chezmoi 未導入なら自動導入して apply
+./scripts/bootstrap-chezmoi.sh --source "$(pwd)"
 
-# この repo を source として dry-run
-./scripts/verify-chezmoi.sh
+# source を環境変数で指定
+CHEZMOI_SOURCE_DIR=/path/to/dotfiles ./scripts/bootstrap-chezmoi.sh
 
-# 実適用
-chezmoi apply --source "$HOME/dotfiles"
+# chezmoi バージョン固定（任意）
+CHEZMOI_VERSION=v2.63.0 ./scripts/bootstrap-chezmoi.sh --source "$(pwd)"
+
+# installer のチェックサム検証（任意）
+CHEZMOI_INSTALLER_SHA256=<sha256> ./scripts/bootstrap-chezmoi.sh --source "$(pwd)"
 ```
 
-## 2. 管理対象
+`bootstrap-chezmoi.sh` は以下を実行します。
 
-`.chezmoiignore` で適用対象を限定しています。
+1. `chezmoi` がなければ `~/.local/bin` にインストール
+2. 指定 source で `chezmoi apply` 実行
 
-- 管理する: 主要 dotfiles（`.zshrc`, `.gitconfig`, `.tmux.conf` など）
-- 管理する: `.codex/**`（必要に応じて追加）
-- 除外する: `install/`, `bin/`, `pkg/`, `local/`, `misc/`, `zsh/` などの運用資材
+`DOTFILES` symlink は作成・更新しません。
 
-## 3. Codex 設定/Skill の取り込み
+## strict / optional
+
+`.chezmoiscripts`（`run_before_*`）は strict がデフォルトです。  
+成功時は `~/.local/state/chezmoi-bootstrap/*.done` に完了マーカーを書きます。
+
+- strict（既定）: `sudo` 不可、非対話で `chsh` 不可、必須コマンド不足などで失敗
+- optional: `CHEZMOI_OPTIONAL_SETUP=1` のときのみ上記を skip 成功扱い（マーカーは未作成）
+- Homebrew installer の検証を有効化する場合は `HOMEBREW_INSTALLER_SHA256` を設定
+
+例:
 
 ```bash
-# ~/.codex からリポジトリ配下 .codex へ取り込み
-./scripts/import-codex.sh
+# strict
+./scripts/bootstrap-chezmoi.sh --source "$(pwd)"
 
-# 差分確認
+# optional（CI/自動化向け）
+CHEZMOI_OPTIONAL_SETUP=1 ./scripts/bootstrap-chezmoi.sh --source "$(pwd)"
+```
+
+## Codex 設定取り込み
+
+```bash
+./scripts/import-codex.sh
 git status
 ```
 
-`import-codex.sh` は以下のみを取り込みます。
+`import-codex.sh` は `~/.codex` から次のみ取り込みます。
 
 - `config.toml`
 - `rules/`
@@ -43,21 +69,20 @@ git status
 - `commands/`
 - `skills/`
 
-`plugins/cache/` は `.codex/.chezmoiignore` で除外します。
+`.codex/.chezmoiignore` は allowlist 方式で生成され、上記以外は apply 対象外です。
 
-## 4. テスト方法
+## 検証
 
 ```bash
-# chezmoi の前提チェック + apply dry-run
-./scripts/verify-chezmoi.sh
-
-# 任意の source を指定して検証
-./scripts/verify-chezmoi.sh /path/to/source
+# doctor + apply dry-run
+./scripts/verify-chezmoi.sh "$(pwd)"
 ```
 
-この dry-run が通れば、`chezmoi apply --source <source>` の適用前検証として利用できます。
+## CI 方針
 
-## 5. 既存インストーラ
+`.travis.yml` は旧 `install/install.sh` を使いません。  
+CIは非対話制約のため optional モード検証を実施し、以下を実行します。
 
-従来の `install/install.sh` も残しています。
-段階移行のため、`chezmoi` と併用可能です。
+1. シェルスクリプト / zsh 設定の構文検証
+2. `CHEZMOI_OPTIONAL_SETUP=1` で `bootstrap-chezmoi.sh --dry-run`
+3. `verify-chezmoi.sh` で doctor + dry-run

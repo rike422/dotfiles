@@ -21,5 +21,10 @@
 !/.xprofile
 !/.zshenv
 !/.zshrc
+!/.config
+!/.config/zsh
+!/.config/zsh/**
+!/.chezmoiscripts
+!/.chezmoiscripts/**
 !/.codex
 !/.codex/**
