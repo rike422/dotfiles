@@ -6,7 +6,7 @@ if ! command -v chezmoi >/dev/null 2>&1; then
   exit 1
 fi
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 SOURCE_DIR="${1:-$ROOT_DIR}"
 DEST_DIR="$(mktemp -d /tmp/chezmoi-dest.XXXXXX)"
 

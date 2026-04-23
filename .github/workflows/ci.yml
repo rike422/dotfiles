@@ -28,19 +28,20 @@ jobs:
 
       - name: Bash syntax check
         run: |
-          bash -n scripts/bootstrap-chezmoi.sh \
-            scripts/import-codex.sh \
+          bash -n ops/chezmoi/bootstrap.sh \
+            ops/chezmoi/verify.sh \
+            ops/codex/import.sh \
             .chezmoiscripts/run_before_10_install_base_packages.sh.tmpl \
             .chezmoiscripts/run_before_20_setup_shell.sh.tmpl \
-            install/install.sh \
-            bin/slink.sh \
-            bin/chsh.sh
+            legacy/install/install.sh \
+            legacy/bin/slink.sh \
+            legacy/bin/chsh.sh
 
       - name: Zsh syntax check
         run: zsh -n .zshrc .config/zsh/*.zsh
 
       - name: Bootstrap dry-run
-        run: ./scripts/bootstrap-chezmoi.sh --source "$GITHUB_WORKSPACE" --dry-run
+        run: ./ops/chezmoi/bootstrap.sh --source "$GITHUB_WORKSPACE" --dry-run
 
       - name: Chezmoi verify
-        run: ./scripts/verify-chezmoi.sh "$GITHUB_WORKSPACE"
+        run: ./ops/chezmoi/verify.sh "$GITHUB_WORKSPACE"

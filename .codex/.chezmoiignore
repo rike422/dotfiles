@@ -1,0 +1,13 @@
+*
+!.chezmoiignore
+!config.toml
+!rules
+!rules/**
+!agents
+!agents/**
+!contexts
+!contexts/**
+!commands
+!commands/**
+!skills
+!skills/**

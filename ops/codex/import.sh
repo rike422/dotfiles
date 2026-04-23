@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 SOURCE_CODEX_DIR="${CODEX_HOME:-$HOME/.codex}"
 TARGET_CODEX_DIR="$ROOT_DIR/.codex"
 

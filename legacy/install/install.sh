@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 cat <<EOF
 [DEPRECATED] install/install.sh は廃止されました。
@@ -13,7 +13,7 @@ cat <<EOF
   chezmoi apply --source "${REPO_ROOT}"
 
 事前検証:
-  "${REPO_ROOT}/scripts/verify-chezmoi.sh"
+  "${REPO_ROOT}/ops/chezmoi/verify.sh"
 EOF
 
 exit 1

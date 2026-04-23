@@ -20,8 +20,9 @@ _chezmoi_source_path() {
   printf '%s\n' "${CHEZMOI_SOURCE_DIR:-$HOME/.local/share/chezmoi}"
 }
 alias cdd='cd "$(_chezmoi_source_path)"'
-alias cddb='cd "$(_chezmoi_source_path)/bin"'
-alias cddi='cd "$(_chezmoi_source_path)/scripts"'
+alias cddb='cd "$(_chezmoi_source_path)/ops/chezmoi"'
+alias cddi='cd "$(_chezmoi_source_path)/ops/codex"'
+alias cddl='cd "$(_chezmoi_source_path)/legacy"'
 
 alias zmv='noglob zmv -W'
 

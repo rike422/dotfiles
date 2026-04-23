@@ -36,16 +36,16 @@ verify_sha256_if_requested() {
 usage() {
   cat <<'USAGE'
 Usage:
-  scripts/bootstrap-chezmoi.sh [--source <dir>] [-- <chezmoi apply args...>]
+  ops/chezmoi/bootstrap.sh [--source <dir>] [-- <chezmoi apply args...>]
 
 Options:
   --source, -s   chezmoi source directory (default: $CHEZMOI_SOURCE_DIR or repo root)
   --help, -h     show this help
 
 Examples:
-  ./scripts/bootstrap-chezmoi.sh
-  ./scripts/bootstrap-chezmoi.sh --source "$HOME/work/dotfiles"
-  ./scripts/bootstrap-chezmoi.sh --source "$PWD" -- --dry-run --verbose
+  ./ops/chezmoi/bootstrap.sh
+  ./ops/chezmoi/bootstrap.sh --source "$HOME/work/dotfiles"
+  ./ops/chezmoi/bootstrap.sh --source "$PWD" -- --dry-run --verbose
 USAGE
 }
 
@@ -96,7 +96,7 @@ main() {
   local -a apply_args=()
 
   script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-  repo_root="$(cd -- "${script_dir}/.." && pwd)"
+  repo_root="$(cd -- "${script_dir}/../.." && pwd)"
   source_dir="${CHEZMOI_SOURCE_DIR:-$repo_root}"
 
   while [[ $# -gt 0 ]]; do
