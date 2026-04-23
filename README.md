@@ -8,9 +8,11 @@
 - `.`（ルート）: chezmoi で配布する dotfiles 本体（`.zshrc` など）
 - `.config/zsh/`: 運用中の zsh 拡張設定
 - `.chezmoiscripts/`: 初回セットアップ用 `run_before_*`
+- `tools/scripts/`: 保持する純粋スクリプト（セットアップ時に `~/.local/bin` へリンク）
 - `.codex/`: Codex 設定の管理対象（allowlist）
 - `ops/chezmoi/`: chezmoi 運用スクリプト（bootstrap/verify）
 - `ops/codex/`: Codex 設定取り込みスクリプト
+- `ops/install/`: 生成可能ツールのセットアップスクリプト
 
 ## セットアップ
 
@@ -26,6 +28,17 @@ CHEZMOI_VERSION=v2.63.0 ./ops/chezmoi/bootstrap.sh --source "$(pwd)"
 
 # installer のチェックサム検証（任意）
 CHEZMOI_INSTALLER_SHA256=<sha256> ./ops/chezmoi/bootstrap.sh --source "$(pwd)"
+```
+
+初期セットアップ時に以下を自動実施します。
+
+- `tools/scripts/*` の純粋スクリプトを `~/.local/bin` にリンク
+- 生成可能なツール（`gibo`）を `~/.local/bin` へ生成
+
+`ops/install/setup-tools.sh` は単体でも再実行できます。
+
+```bash
+./ops/install/setup-tools.sh --source "$(pwd)"
 ```
 
 ## strict / optional

@@ -73,7 +73,7 @@ install_chezmoi() {
   local installer
 
   if [[ -n "${CHEZMOI_VERSION:-}" ]]; then
-    install_args+=("--version" "${CHEZMOI_VERSION}")
+    install_args+=("-t" "${CHEZMOI_VERSION}")
   fi
 
   if ! has_cmd curl; then
@@ -84,7 +84,7 @@ install_chezmoi() {
   installer="$(mktemp /tmp/chezmoi-install.XXXXXX)"
   curl -fsLS get.chezmoi.io -o "$installer"
   verify_sha256_if_requested "$installer" "${CHEZMOI_INSTALLER_SHA256:-}"
-  sh "$installer" -- "${install_args[@]}"
+  sh "$installer" "${install_args[@]}"
   rm -f "$installer"
 }
 

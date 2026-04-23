@@ -30,12 +30,21 @@ jobs:
         run: |
           bash -n ops/chezmoi/bootstrap.sh \
             ops/chezmoi/verify.sh \
+            ops/install/setup-tools.sh \
             ops/codex/import.sh \
             .chezmoiscripts/run_before_10_install_base_packages.sh.tmpl \
-            .chezmoiscripts/run_before_20_setup_shell.sh.tmpl
+            .chezmoiscripts/run_before_20_setup_shell.sh.tmpl \
+            .chezmoiscripts/run_before_30_setup_tools.sh.tmpl
 
       - name: Zsh syntax check
         run: zsh -n .zshrc .config/zsh/*.zsh
+
+      - name: Tool script syntax check
+        run: |
+          ruby -c tools/scripts/color
+          ruby -c tools/scripts/ghbin
+          perl -c tools/scripts/diff-highlight
+          bash -n tools/scripts/github_latest_release.sh tools/scripts/ike-scan.sh
 
       - name: Bootstrap dry-run
         run: ./ops/chezmoi/bootstrap.sh --source "$GITHUB_WORKSPACE" --dry-run
