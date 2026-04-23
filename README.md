@@ -11,7 +11,6 @@
 - `.codex/`: Codex 設定の管理対象（allowlist）
 - `ops/chezmoi/`: chezmoi 運用スクリプト（bootstrap/verify）
 - `ops/codex/`: Codex 設定取り込みスクリプト
-- `legacy/`: 旧運用資材（参照用、通常は使わない）
 
 ## セットアップ
 

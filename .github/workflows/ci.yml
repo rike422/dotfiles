@@ -32,10 +32,7 @@ jobs:
             ops/chezmoi/verify.sh \
             ops/codex/import.sh \
             .chezmoiscripts/run_before_10_install_base_packages.sh.tmpl \
-            .chezmoiscripts/run_before_20_setup_shell.sh.tmpl \
-            legacy/install/install.sh \
-            legacy/bin/slink.sh \
-            legacy/bin/chsh.sh
+            .chezmoiscripts/run_before_20_setup_shell.sh.tmpl
 
       - name: Zsh syntax check
         run: zsh -n .zshrc .config/zsh/*.zsh
