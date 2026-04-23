@@ -26,6 +26,12 @@ jobs:
       - name: Ensure ~/.local/bin in PATH
         run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      - name: Install zsh (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh
+
       - name: Bash syntax check
         run: |
           bash -n ops/chezmoi/bootstrap.sh \
