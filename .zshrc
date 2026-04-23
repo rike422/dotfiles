@@ -186,59 +186,29 @@ if [ -f "$HOME/.cargo/env" ]; then
   source "$HOME/.cargo/env"
 fi
 
-# Java-SDKMan
-if [ -d "$HOME/.sdkman/bin" ]; then
-  export SDKMAN_DIR="$HOME/.sdkman"
-  [ -f "$SDKMAN_DIR/bin/sdkman-init.sh" ] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
-fi
-
-# evm
-if [ -d "$HOME/.evm" ]; then
-  export EVM_HOME="$HOME/.evm"
-  [ -f "$EVM_HOME/scripts/evm" ] && source "$EVM_HOME/scripts/evm"
+# runtime manager (mise-first)
+if [ -x "$(command -v mise)" ]; then
+  eval "$(mise activate zsh)"
+elif [[ -o interactive ]]; then
+  echo "[WARN] mise が見つかりません。ランタイムは有効化されません。" >&2
 fi
 
 # golang
-if [ -d "$HOME/.goenv/bin" ]; then
-  export GOENV_ROOT="$HOME/.goenv"
-  export GOPATH="$HOME/dev"
-  export PATH="$GOENV_ROOT/bin:$GOPATH/bin:$PATH"
-  eval "$(goenv init -)"
-fi
-
-# rbenv
-if [ -d "$HOME/.rbenv/bin" ]; then
-  export CONFIGURE_OPTS="--disable-install-doc"
-  export RBENV_ROOT="$HOME/.rbenv"
-  export PATH="$RBENV_ROOT/bin:$PATH"
-  eval "$(rbenv init -)"
-  rbenv global 2.6.2
-fi
-
-# phpenv
-if [ -d "$HOME/.phpenv/bin" ]; then
-  export CONFIGURE_OPTS="--disable-install-doc"
-  export PHPENV_ROOT="$HOME/.phpenv"
-  export PATH="$PHPENV_ROOT/bin:$PATH"
-  eval "$(phpenv init -)"
-fi
+export GOPATH="${GOPATH:-$HOME/dev}"
+[ -d "$GOPATH/bin" ] && export PATH="$GOPATH/bin:$PATH"
 
 # hub
 if [ -x "$(command -v hub)" ]; then
   eval "$(hub alias -s)"
 fi
 
-# nodebrew
-if [ -d "$HOME/.nodebrew/current/bin" ]; then
-  export NODEBREW_ROOT="$HOME/.nodebrew"
-  export PATH="$NODEBREW_ROOT/current/bin:$PATH"
-  if [ -x "$(command -v npm)" ]; then
-    . <(npm completion)
-  fi
+# node
+if [ -x "$(command -v npm)" ]; then
+  . <(npm completion)
   alias npmls="npm ls --depth 0"
-  export PATH="$HOME/node_modules/.bin:$PATH"
-  export PATH="./node_modules/.bin:$PATH"
 fi
+export PATH="$HOME/node_modules/.bin:$PATH"
+export PATH="./node_modules/.bin:$PATH"
 
 if [ -x "$(command -v direnv)" ]; then
   eval "$(direnv hook zsh)"

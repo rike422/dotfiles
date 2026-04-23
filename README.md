@@ -7,12 +7,13 @@
 
 - `.`（ルート）: chezmoi で配布する dotfiles 本体（`.zshrc` など）
 - `.config/zsh/`: 運用中の zsh 拡張設定
+- `.config/mise/`: mise グローバル設定（runtime/tool version 管理）
 - `.chezmoiscripts/`: 初回セットアップ用 `run_before_*`
 - `tools/scripts/`: 保持する純粋スクリプト（セットアップ時に `~/.local/bin` へリンク）
 - `.codex/`: Codex 設定の管理対象（allowlist）
 - `ops/chezmoi/`: chezmoi 運用スクリプト（bootstrap/verify）
 - `ops/codex/`: Codex 設定取り込みスクリプト
-- `ops/install/`: 生成可能ツールのセットアップスクリプト
+- `ops/install/`: セットアップスクリプト（mise導入 / runtime導入 / 純粋スクリプトリンク）
 
 ## セットアップ
 
@@ -32,14 +33,45 @@ CHEZMOI_INSTALLER_SHA256=<sha256> ./ops/chezmoi/bootstrap.sh --source "$(pwd)"
 
 初期セットアップ時に以下を自動実施します。
 
+- `run_before_25_install_mise.sh.tmpl`: mise 導入
 - `tools/scripts/*` の純粋スクリプトを `~/.local/bin` にリンク
 - 生成可能なツール（`gibo`）を `~/.local/bin` へ生成
+- `run_before_35_setup_mise_tools.sh.tmpl`: runtime/tool 導入（mise）
 
-`ops/install/setup-tools.sh` は単体でも再実行できます。
+必要なら個別に再実行できます。
 
 ```bash
+# mise 導入
+./ops/install/setup-mise.sh --source "$(pwd)"
+
+# mise runtime/tool 導入
+./ops/install/setup-mise-tools.sh --source "$(pwd)"
+
+# 純粋スクリプトリンク + gibo 生成
 ./ops/install/setup-tools.sh --source "$(pwd)"
 ```
+
+## ランタイム管理（mise-first）
+
+- `.zshrc` は `eval "$(mise activate zsh)"` でランタイムを有効化します
+- 言語ランタイム導入・バージョン固定は `mise` 側で実施します
+- `mise` 未導入時は `.zshrc` が concise な warning を出し、シェル自体は継続します
+
+## レガシーカテゴリからの対応表
+
+| レガシーカテゴリ | 旧方式 | 新フロー |
+| --- | --- | --- |
+| Java | `sdkman` | `mise` で一元管理（zsh 起動時に `mise activate`） |
+| Erlang/Elixir | `evm` | `mise` で一元管理（zsh 起動時に `mise activate`） |
+| Go | `goenv` | `mise` で一元管理 + `.zshrc` で `GOPATH/bin` を補助 |
+| Ruby | `rbenv` | `mise` で一元管理 |
+| PHP | `phpenv` | `mise` で一元管理 |
+| Node.js | `nodebrew` | `mise` で一元管理 + npm 補完/`npmls`/`node_modules/.bin` は `.zshrc` 側で維持 |
+| `aws-cli`/`hub`/`direnv`/`protoc`/`peco` | 個別 install スクリプト | `run_before_35_setup_mise_tools.sh.tmpl` で `mise install` |
+| `gibo`/`diff-highlight`/`color` など | `bin/` 直配置 | `tools/scripts/` 保持 + `run_before_30_setup_tools.sh.tmpl` でリンク |
+| インストール導線 | 個別 runtime install スクリプト | `ops/chezmoi/bootstrap.sh`（`run_before_*`）+ `mise` + `ops/install/*` |
+
+旧 runtime-manager 前提の初期化・インストール責務は `mise` + `chezmoi` フローに吸収しています。
 
 ## strict / optional
 

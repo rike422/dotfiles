@@ -36,14 +36,22 @@ jobs:
         run: |
           bash -n ops/chezmoi/bootstrap.sh \
             ops/chezmoi/verify.sh \
+            ops/install/setup-mise.sh \
+            ops/install/setup-mise-tools.sh \
             ops/install/setup-tools.sh \
+            ops/mise/tool-specs.sh \
             ops/codex/import.sh \
             .chezmoiscripts/run_before_10_install_base_packages.sh.tmpl \
             .chezmoiscripts/run_before_20_setup_shell.sh.tmpl \
-            .chezmoiscripts/run_before_30_setup_tools.sh.tmpl
+            .chezmoiscripts/run_before_25_install_mise.sh.tmpl \
+            .chezmoiscripts/run_before_30_setup_tools.sh.tmpl \
+            .chezmoiscripts/run_before_35_setup_mise_tools.sh.tmpl
 
       - name: Zsh syntax check
         run: zsh -n .zshrc .config/zsh/*.zsh
+
+      - name: Bash profile syntax check
+        run: bash -n .bash_profile
 
       - name: Tool script syntax check
         run: |

@@ -24,6 +24,8 @@
 !/.config
 !/.config/zsh
 !/.config/zsh/**
+!/.config/mise
+!/.config/mise/**
 !/.chezmoiscripts
 !/.chezmoiscripts/**
 !/.codex

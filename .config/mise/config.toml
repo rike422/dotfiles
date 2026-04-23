@@ -1,0 +1,26 @@
+[settings]
+# Keep behavior explicit and avoid external tracking service defaults.
+use_versions_host = false
+use_versions_host_track = false
+
+# Defaults remain permissive; tighten via env when needed:
+#   MISE_LOCKED=1
+#   MISE_PARANOID=1
+locked = false
+paranoid = false
+
+[tools]
+ruby = "latest"
+node = "lts"
+go = "latest"
+java = "latest"
+php = "latest"
+rust = "stable"
+erlang = "latest"
+terraform = "latest"
+flutter = "stable"
+aws-cli = "latest"
+hub = "latest"
+direnv = "latest"
+protoc = "latest"
+peco = "latest"
