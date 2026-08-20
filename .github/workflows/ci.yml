@@ -21,7 +21,7 @@ jobs:
       CHEZMOI_OPTIONAL_SETUP: "1"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Ensure ~/.local/bin in PATH
         run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -48,7 +48,7 @@ jobs:
             .chezmoiscripts/run_before_35_setup_mise_tools.sh.tmpl
 
       - name: Zsh syntax check
-        run: zsh -n .zshrc .config/zsh/*.zsh
+        run: zsh -n .zshenv .zshrc .config/zsh/*.zsh
 
       - name: Bash profile syntax check
         run: bash -n .bash_profile

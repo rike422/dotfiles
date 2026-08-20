@@ -1,11 +1,9 @@
 *
 !/.alacritty.yml
 !/.bash_profile
-!/.gemrc
 !/.gitconfig
 !/.gitignore_global
 !/.gvimrc
-!/.hgrc
 !/.ideavimrc
 !/.npmrc
 !/.peco

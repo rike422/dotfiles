@@ -14,7 +14,7 @@
 - 言語ランタイム導入・切替は `mise` に統一
 - `ops/install/setup-mise.sh` が runtime manager の導入責務を持つ
 - `ops/install/setup-mise-tools.sh` が runtime/tool の導入責務を持つ
-- ランタイム有効化は `.zshrc` の `eval "$(mise activate zsh)"` で実施
+- ランタイム有効化は `.zshenv` の shims + `.zshrc` の `eval "$(mise activate zsh)"` で実施
 
 ## レガシー導線の吸収先
 

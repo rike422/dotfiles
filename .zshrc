@@ -5,7 +5,8 @@
 # ------------------------------
 export EDITOR=vim        # エディタをvimに設定
 export LANG=ja_JP.UTF-8  # 文字コードをUTF-8に設定
-export LC_TYPE=ja_JP.UTF-8
+export LC_CTYPE=ja_JP.UTF-8
+export LC_ALL=ja_JP.UTF-8
 export KCODE=utf-8       # KCODEにUTF-8を設定
 export AUTOFEATURE=true  # autotestでfeatureを動かす
 export ZSH_CONFIG_DIR="$HOME/.config/zsh"
@@ -171,54 +172,41 @@ if command -v zplug >/dev/null 2>&1; then
 fi
 
 # -----------------------------
-# exports
+# interactive hooks
+# PATH / Homebrew / mise shims は .zshenv 側
 # -----------------------------
-[ -d "$HOME/bin" ] && export PATH="$HOME/bin:$PATH"
-[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
 
 # zsh-completions
-if [ -e /usr/local/share/zsh-completions ]; then
+if [ -e /opt/homebrew/share/zsh-completions ]; then
+  fpath=(/opt/homebrew/share/zsh-completions $fpath)
+elif [ -e /usr/local/share/zsh-completions ]; then
   fpath=(/usr/local/share/zsh-completions $fpath)
 fi
 
-# rust
-if [ -f "$HOME/.cargo/env" ]; then
-  source "$HOME/.cargo/env"
-fi
-
 # runtime manager (mise-first)
-if [ -x "$(command -v mise)" ]; then
+if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh)"
 elif [[ -o interactive ]]; then
   echo "[WARN] mise が見つかりません。ランタイムは有効化されません。" >&2
 fi
 
-# golang
-export GOPATH="${GOPATH:-$HOME/dev}"
-[ -d "$GOPATH/bin" ] && export PATH="$GOPATH/bin:$PATH"
-
 # hub
-if [ -x "$(command -v hub)" ]; then
+if command -v hub >/dev/null 2>&1; then
   eval "$(hub alias -s)"
 fi
 
 # node
-if [ -x "$(command -v npm)" ]; then
+if command -v npm >/dev/null 2>&1; then
   . <(npm completion)
   alias npmls="npm ls --depth 0"
 fi
-export PATH="$HOME/node_modules/.bin:$PATH"
-export PATH="./node_modules/.bin:$PATH"
 
-if [ -x "$(command -v direnv)" ]; then
+if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook zsh)"
 fi
 
-if [ -x "$(command -v docker)" ]; then
+if command -v docker >/dev/null 2>&1; then
   export DOCKER_BUILDKIT=1
 fi
 
-# export bin
-[ -d "$HOME/.local/openssl/bin" ] && export PATH="$HOME/.local/openssl/bin:$PATH"
-[ -d "$HOME/.local/tmux/bin" ] && export PATH="$HOME/.local/tmux/bin:$PATH"
-[ -d "$HOME/.local/peco" ] && export PATH="$HOME/.local/peco:$PATH"
+alias gsed="sed"

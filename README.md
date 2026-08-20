@@ -5,7 +5,7 @@
 
 ## ディレクトリ構成
 
-- `.`（ルート）: chezmoi で配布する dotfiles 本体（`.zshrc` など）
+- `.`（ルート）: chezmoi で配布する dotfiles 本体（`.zshenv` / `.zshrc` など）
 - `.config/zsh/`: 運用中の zsh 拡張設定
 - `.config/mise/`: mise グローバル設定（runtime/tool version 管理）
 - `.chezmoiscripts/`: 初回セットアップ用 `run_before_*`
@@ -25,7 +25,7 @@
 CHEZMOI_SOURCE_DIR=/path/to/dotfiles ./ops/chezmoi/bootstrap.sh
 
 # chezmoi バージョン固定（任意）
-CHEZMOI_VERSION=v2.63.0 ./ops/chezmoi/bootstrap.sh --source "$(pwd)"
+CHEZMOI_VERSION=v2.72.0 ./ops/chezmoi/bootstrap.sh --source "$(pwd)"
 
 # installer のチェックサム検証（任意）
 CHEZMOI_INSTALLER_SHA256=<sha256> ./ops/chezmoi/bootstrap.sh --source "$(pwd)"
@@ -53,7 +53,8 @@ CHEZMOI_INSTALLER_SHA256=<sha256> ./ops/chezmoi/bootstrap.sh --source "$(pwd)"
 
 ## ランタイム管理（mise-first）
 
-- `.zshrc` は `eval "$(mise activate zsh)"` でランタイムを有効化します
+- `.zshenv` は `eval "$(mise activate zsh --shims)"` で非対話シェルにもランタイムを通します
+- `.zshrc` は `eval "$(mise activate zsh)"` で対話シェルの hook を有効化します
 - 言語ランタイム導入・バージョン固定は `mise` 側で実施します
 - `mise` 未導入時は `.zshrc` が concise な warning を出し、シェル自体は継続します
 
@@ -63,10 +64,10 @@ CHEZMOI_INSTALLER_SHA256=<sha256> ./ops/chezmoi/bootstrap.sh --source "$(pwd)"
 | --- | --- | --- |
 | Java | `sdkman` | `mise` で一元管理（zsh 起動時に `mise activate`） |
 | Erlang/Elixir | `evm` | `mise` で一元管理（zsh 起動時に `mise activate`） |
-| Go | `goenv` | `mise` で一元管理 + `.zshrc` で `GOPATH/bin` を補助 |
+| Go | `goenv` | `mise` で一元管理 + `.zshenv` で `GOPATH/bin` を補助 |
 | Ruby | `rbenv` | `mise` で一元管理 |
 | PHP | `phpenv` | `mise` で一元管理 |
-| Node.js | `nodebrew` | `mise` で一元管理 + npm 補完/`npmls`/`node_modules/.bin` は `.zshrc` 側で維持 |
+| Node.js | `nodebrew` | `mise` で一元管理 + npm 補完/`npmls` は `.zshrc`、`node_modules/.bin` は `.zshenv` |
 | `aws-cli`/`hub`/`direnv`/`protoc`/`peco` | 個別 install スクリプト | `run_before_35_setup_mise_tools.sh.tmpl` で `mise install` |
 | `gibo`/`diff-highlight`/`color` など | `bin/` 直配置 | `tools/scripts/` 保持 + `run_before_30_setup_tools.sh.tmpl` でリンク |
 | インストール導線 | 個別 runtime install スクリプト | `ops/chezmoi/bootstrap.sh`（`run_before_*`）+ `mise` + `ops/install/*` |
