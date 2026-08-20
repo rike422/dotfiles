@@ -1,0 +1,365 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi-bootstrap"
+MARKER_FILE="$STATE_DIR/base-packages.done"
+OPTIONAL_SKIPPED=0
+
+log() {
+  printf '[chezmoi][base] %s\n' "$*"
+}
+
+has_cmd() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+optional_mode_enabled() {
+  case "${CHEZMOI_OPTIONAL_SETUP:-0}" in
+    1|true|TRUE|yes|YES)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+skip_or_fail() {
+  local reason="$1"
+  if optional_mode_enabled; then
+    OPTIONAL_SKIPPED=1
+    log "optional-skip: $reason (CHEZMOI_OPTIONAL_SETUP=1)"
+    return 0
+  fi
+
+  log "error: $reason"
+  return 1
+}
+
+can_use_sudo_non_interactive() {
+  has_cmd sudo && sudo -n true >/dev/null 2>&1
+}
+
+run_with_sudo() {
+  if [[ "$(id -u)" -eq 0 ]]; then
+    "$@"
+    return 0
+  fi
+
+  if can_use_sudo_non_interactive; then
+    sudo "$@"
+    return 0
+  fi
+
+  skip_or_fail "sudo が必要なため実行できません: $*"
+}
+
+verify_sha256_if_requested() {
+  local file="$1"
+  local expected="$2"
+
+  if [[ -z "$expected" ]]; then
+    return 0
+  fi
+
+  if ! has_cmd shasum; then
+    skip_or_fail 'shasum が見つからないためチェックサム検証できません'
+    return $?
+  fi
+
+  local actual
+  actual="$(shasum -a 256 "$file" | awk '{print $1}')"
+  if [[ "$actual" != "$expected" ]]; then
+    log "error: checksum mismatch expected=$expected actual=$actual"
+    return 1
+  fi
+}
+
+ensure_homebrew() {
+  if has_cmd brew; then
+    return 0
+  fi
+
+  if ! has_cmd curl; then
+    skip_or_fail 'curl が見つからないため Homebrew をインストールできません'
+    return $?
+  fi
+
+  local installer
+  installer="$(mktemp /tmp/homebrew-install.XXXXXX)"
+  curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$installer"
+  verify_sha256_if_requested "$installer" "${HOMEBREW_INSTALLER_SHA256:-}"
+
+  log 'Homebrew が見つからないためインストールします'
+  NONINTERACTIVE=1 /bin/bash "$installer"
+  rm -f "$installer"
+
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+
+  if has_cmd brew; then
+    return 0
+  fi
+
+  skip_or_fail 'Homebrew の初期化に失敗しました'
+}
+
+install_brew_packages() {
+  local -a packages=(
+    cmake
+    gcc
+    git
+    jq
+    nkf
+    ngrep
+    source-highlight
+    tig
+    tmux
+    tree
+    vim
+    wget
+    w3m
+    zopfli
+    zsh
+  )
+  local -a to_install=()
+  local pkg
+
+  ensure_homebrew
+  if ! has_cmd brew; then
+    skip_or_fail 'brew が見つからないためパッケージを導入できません'
+    return $?
+  fi
+
+  for pkg in "${packages[@]}"; do
+    if brew list --formula "$pkg" >/dev/null 2>&1; then
+      log "skip: $pkg は既にインストール済み"
+      continue
+    fi
+
+    if ! brew info "$pkg" >/dev/null 2>&1; then
+      log "skip: $pkg は Homebrew で見つかりません"
+      continue
+    fi
+
+    to_install+=("$pkg")
+  done
+
+  if [[ ${#to_install[@]} -eq 0 ]]; then
+    log 'インストール対象の Homebrew パッケージはありません'
+    return 0
+  fi
+
+  log "Homebrew パッケージをインストール: ${to_install[*]}"
+  brew install "${to_install[@]}"
+}
+
+apt_package_available() {
+  apt-cache show "$1" >/dev/null 2>&1
+}
+
+install_apt_packages() {
+  local -a packages=(
+    build-essential
+    cmake
+    coreutils
+    curl
+    git
+    jq
+    libevent-dev
+    libev-dev
+    libev4
+    libncurses-dev
+    libpcre3
+    libpcre3-dev
+    libreadline-dev
+    libssl-dev
+    libxml2-dev
+    libxslt1-dev
+    ngrep
+    nkf
+    source-highlight
+    tig
+    tree
+    unzip
+    vim
+    w3m
+    xsel
+    zopfli
+    zsh
+  )
+  local -a to_install=()
+  local pkg
+
+  run_with_sudo apt-get update
+
+  for pkg in "${packages[@]}"; do
+    if dpkg -s "$pkg" >/dev/null 2>&1; then
+      log "skip: $pkg は既にインストール済み"
+      continue
+    fi
+
+    if ! apt_package_available "$pkg"; then
+      log "skip: $pkg は apt リポジトリで見つかりません"
+      continue
+    fi
+
+    to_install+=("$pkg")
+  done
+
+  if [[ ${#to_install[@]} -eq 0 ]]; then
+    log 'インストール対象の apt パッケージはありません'
+    return 0
+  fi
+
+  log "apt パッケージをインストール: ${to_install[*]}"
+  run_with_sudo apt-get install -y "${to_install[@]}"
+}
+
+install_dnf_packages() {
+  local -a packages=(
+    gcc-c++
+    git
+    jq
+    make
+    openssl-devel
+    tig
+    tmux
+    tree
+    vim
+    wget
+    zsh
+  )
+  local -a to_install=()
+  local pkg
+
+  for pkg in "${packages[@]}"; do
+    if rpm -q "$pkg" >/dev/null 2>&1; then
+      log "skip: $pkg は既にインストール済み"
+      continue
+    fi
+
+    if ! dnf info "$pkg" >/dev/null 2>&1; then
+      log "skip: $pkg は dnf リポジトリで見つかりません"
+      continue
+    fi
+
+    to_install+=("$pkg")
+  done
+
+  if [[ ${#to_install[@]} -eq 0 ]]; then
+    log 'インストール対象の dnf パッケージはありません'
+    return 0
+  fi
+
+  log "dnf パッケージをインストール: ${to_install[*]}"
+  run_with_sudo dnf install -y "${to_install[@]}"
+}
+
+install_yum_packages() {
+  local -a packages=(
+    gcc-c++
+    git
+    jq
+    make
+    openssl-devel
+    tig
+    tmux
+    tree
+    vim-enhanced
+    wget
+    zsh
+  )
+  local -a to_install=()
+  local pkg
+
+  for pkg in "${packages[@]}"; do
+    if rpm -q "$pkg" >/dev/null 2>&1; then
+      log "skip: $pkg は既にインストール済み"
+      continue
+    fi
+
+    if ! yum info "$pkg" >/dev/null 2>&1; then
+      log "skip: $pkg は yum リポジトリで見つかりません"
+      continue
+    fi
+
+    to_install+=("$pkg")
+  done
+
+  if [[ ${#to_install[@]} -eq 0 ]]; then
+    log 'インストール対象の yum パッケージはありません'
+    return 0
+  fi
+
+  log "yum パッケージをインストール: ${to_install[*]}"
+  run_with_sudo yum install -y "${to_install[@]}"
+}
+
+verify_required_commands() {
+  local -a required_cmds=(git zsh)
+  local -a missing_cmds=()
+  local cmd
+
+  for cmd in "${required_cmds[@]}"; do
+    if ! has_cmd "$cmd"; then
+      missing_cmds+=("$cmd")
+    fi
+  done
+
+  if [[ ${#missing_cmds[@]} -eq 0 ]]; then
+    return 0
+  fi
+
+  skip_or_fail "必須コマンドが不足しています: ${missing_cmds[*]}"
+}
+
+finalize_marker() {
+  if [[ "$OPTIONAL_SKIPPED" -eq 1 ]]; then
+    log 'optional-skip が発生したため完了マーカーは作成しません'
+    return 0
+  fi
+
+  mkdir -p "$STATE_DIR"
+  date -u +%Y-%m-%dT%H:%M:%SZ > "$MARKER_FILE"
+  log "完了マーカーを作成しました: $MARKER_FILE"
+}
+
+main() {
+  if [[ -f "$MARKER_FILE" ]]; then
+    log "skip: 既に完了済みです ($MARKER_FILE)"
+    return 0
+  fi
+
+  if optional_mode_enabled; then
+    log 'optional モードで実行します（権限不足/非対話時の一部処理を許容）'
+  fi
+
+  case "$(uname -s)" in
+    Darwin)
+      install_brew_packages
+      ;;
+    Linux)
+      if has_cmd apt-get; then
+        install_apt_packages
+      elif has_cmd dnf; then
+        install_dnf_packages
+      elif has_cmd yum; then
+        install_yum_packages
+      else
+        skip_or_fail 'サポート外の Linux パッケージマネージャーです (apt/dnf/yum が必要)'
+      fi
+      ;;
+    *)
+      skip_or_fail "サポート外 OS: $(uname -s)"
+      ;;
+  esac
+
+  verify_required_commands
+  finalize_marker
+}
+
+main "$@"

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi-bootstrap"
+MARKER_FILE="$STATE_DIR/mise-install.done"
+SOURCE_DIR="{{ .chezmoi.sourceDir }}"
+STATUS_FILE=""
+OPTIONAL_SKIPPED=0
+
+log() {
+  printf '[chezmoi][mise-install] %s\n' "$*"
+}
+
+cleanup() {
+  if [[ -n "$STATUS_FILE" ]] && [[ -f "$STATUS_FILE" ]]; then
+    rm -f "$STATUS_FILE"
+  fi
+}
+
+read_optional_status() {
+  if [[ -z "$STATUS_FILE" ]] || [[ ! -f "$STATUS_FILE" ]]; then
+    return 0
+  fi
+
+  if grep -Eq '^optional_skipped=1$' "$STATUS_FILE"; then
+    OPTIONAL_SKIPPED=1
+  fi
+}
+
+finalize_marker() {
+  if [[ "$OPTIONAL_SKIPPED" -eq 1 ]]; then
+    log 'optional-skip detected; marker is not created'
+    return 0
+  fi
+
+  mkdir -p "$STATE_DIR"
+  date -u +%Y-%m-%dT%H:%M:%SZ > "$MARKER_FILE"
+  log "created marker: $MARKER_FILE"
+}
+
+main() {
+  if [[ -f "$MARKER_FILE" ]]; then
+    log "skip: already completed ($MARKER_FILE)"
+    return 0
+  fi
+
+  if [[ -z "$SOURCE_DIR" ]]; then
+    log 'error: source directory is empty'
+    exit 1
+  fi
+
+  if [[ ! -d "$SOURCE_DIR" ]]; then
+    log "error: source directory does not exist: $SOURCE_DIR"
+    exit 1
+  fi
+
+  STATUS_FILE="$(mktemp "${TMPDIR:-/tmp}/chezmoi-mise-install-status.XXXXXX")"
+  trap cleanup EXIT
+
+  "$SOURCE_DIR/ops/install/setup-mise.sh" \
+    --source "$SOURCE_DIR" \
+    --status-file "$STATUS_FILE"
+
+  read_optional_status
+  finalize_marker
+}
+
+main "$@"

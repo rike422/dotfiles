@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "fileutils"
+require "shellwords"
+
+HELP = <<~EOS
+  Download build binary from GitHub release.
+  64-bit assets via zip or tarball.
+  $ ghbin peco/peco
+EOS
+
+def run_or_fail(cmd)
+  ok = system(cmd)
+  return if ok
+
+  warn("ERROR: command failed: #{cmd}")
+  exit(1)
+end
+
+def esc(value)
+  Shellwords.escape(value)
+end
+
+def detect_arch
+  `uname`.strip.downcase
+end
+
+def resolve_destination_root
+  return ENV["DOTFILES"] unless ENV["DOTFILES"].to_s.empty?
+  return ENV["CHEZMOI_SOURCE_DIR"] unless ENV["CHEZMOI_SOURCE_DIR"].to_s.empty?
+
+  File.join(ENV.fetch("HOME"), ".local", "share", "dotfiles")
+end
+
+arg = ARGV.shift
+if arg.nil? || arg == "-h" || arg == "--help"
+  puts HELP
+  exit(0)
+end
+
+owner, repo = arg.split("/", 2)
+if owner.to_s.empty? || repo.to_s.empty?
+  warn("ERROR: owner/repo 形式で指定してください。例: ghbin peco/peco")
+  exit(1)
+end
+
+%w[curl jq grep].each do |required|
+  next if system("command -v #{required} >/dev/null 2>&1")
+
+  warn("ERROR: required command not found: #{required}")
+  exit(1)
+end
+
+arch = detect_arch
+releases = "https://api.github.com/repos/#{owner}/#{repo}/releases/latest"
+puts("\nACCESS TO: #{releases}\n\n")
+
+url_cmd = "curl -fsSL #{esc(releases)} | jq -r '.assets[] | .browser_download_url' | grep #{esc(arch)} | grep 64 | grep -vi arm | head -n 1"
+url = `#{url_cmd}`.strip
+
+if url.empty?
+  warn("ERROR: release asset が見つかりませんでした: #{owner}/#{repo} arch=#{arch}")
+  exit(1)
+end
+
+puts("\nTARGET URL: #{url}\n\n")
+
+archive = File.basename(url)
+basename = archive.dup
+basename = File.basename(basename, File.extname(basename)) until File.extname(basename).empty?
+
+tmp_archive = "/tmp/#{archive}"
+tmp_extract = "/tmp/#{basename}"
+dest_root = resolve_destination_root
+dest_dir = File.join(dest_root, "pkg", repo)
+
+run_or_fail("curl -fsSL #{esc(url)} --output #{esc(tmp_archive)}")
+puts("\nSAVE TO: #{tmp_archive}\n\n")
+
+if archive.end_with?(".tar.gz") || archive.end_with?(".tgz")
+  run_or_fail("rm -rf #{esc(tmp_extract)}")
+  run_or_fail("tar zxf #{esc(tmp_archive)} -C /tmp")
+else
+  run_or_fail("rm -rf #{esc(tmp_extract)}")
+  run_or_fail("mkdir -p #{esc(tmp_extract)}")
+  run_or_fail("unzip -j #{esc(tmp_archive)} -d #{esc(tmp_extract)}")
+end
+
+FileUtils.mkdir_p(File.dirname(dest_dir))
+run_or_fail("rm -rf #{esc(dest_dir)}")
+run_or_fail("mv #{esc(tmp_extract)} #{esc(dest_dir)}")
+puts("\nMOVE TO: #{dest_dir}\n\n")

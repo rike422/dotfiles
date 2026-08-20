@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SOURCE_DIR="{{ .chezmoi.sourceDir }}"
+
+if [[ -z "$SOURCE_DIR" ]]; then
+  echo '[chezmoi][tools] error: source directory が空です' >&2
+  exit 1
+fi
+
+if [[ ! -d "$SOURCE_DIR" ]]; then
+  echo "[chezmoi][tools] error: source directory が存在しません: $SOURCE_DIR" >&2
+  exit 1
+fi
+
+"$SOURCE_DIR/ops/install/setup-tools.sh" --source "$SOURCE_DIR"
