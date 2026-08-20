@@ -48,10 +48,10 @@ jobs:
             .chezmoiscripts/run_before_35_setup_mise_tools.sh.tmpl
 
       - name: Zsh syntax check
-        run: zsh -n .zshenv .zshrc .config/zsh/*.zsh
+        run: zsh -n dot_zshenv dot_zshrc dot_config/zsh/*.zsh
 
       - name: Bash profile syntax check
-        run: bash -n .bash_profile
+        run: bash -n dot_bash_profile
 
       - name: Tool script syntax check
         run: |

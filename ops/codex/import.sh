@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 SOURCE_CODEX_DIR="${CODEX_HOME:-$HOME/.codex}"
-TARGET_CODEX_DIR="$ROOT_DIR/.codex"
+TARGET_CODEX_DIR="$ROOT_DIR/dot_codex"
 
 log() {
   printf '[import-codex] %s\n' "$*"
@@ -54,5 +54,5 @@ cat > "$TARGET_CODEX_DIR/.chezmoiignore" <<'IGNORE'
 !skills/**
 IGNORE
 
-log '.codex/.chezmoiignore を allowlist 方式で更新しました'
+log 'dot_codex/.chezmoiignore を allowlist 方式で更新しました'
 echo "[OK] .codex を取り込みました。差分を確認して commit してください。"

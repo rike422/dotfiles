@@ -38,6 +38,15 @@ fi
 echo "[INFO] source: $SOURCE_DIR"
 echo "[INFO] destination(dry-run): $DEST_DIR"
 
+required_managed=(.zshenv .zshrc .tmux.conf .gitconfig)
+managed="$("$CHEZMOI_BIN_PATH" managed --source "$SOURCE_DIR" --destination "$DEST_DIR")"
+for required in "${required_managed[@]}"; do
+  if ! grep -qx "$required" <<<"$managed"; then
+    echo "[ERROR] chezmoi が $required を管理していません" >&2
+    exit 1
+  fi
+done
+
 "$CHEZMOI_BIN_PATH" doctor --source "$SOURCE_DIR" --destination "$DEST_DIR"
 "$CHEZMOI_BIN_PATH" apply --dry-run --source "$SOURCE_DIR" --destination "$DEST_DIR" --verbose
 

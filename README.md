@@ -5,12 +5,12 @@
 
 ## ディレクトリ構成
 
-- `.`（ルート）: chezmoi で配布する dotfiles 本体（`.zshenv` / `.zshrc` など）
-- `.config/zsh/`: 運用中の zsh 拡張設定
-- `.config/mise/`: mise グローバル設定（runtime/tool version 管理）
+- `dot_*`（ルート）: chezmoi source。`dot_zshrc` は `~/.zshrc` に展開される
+- `dot_config/zsh/`: 運用中の zsh 拡張設定（`~/.config/zsh/`）
+- `dot_config/mise/`: mise グローバル設定（`~/.config/mise/`）
 - `.chezmoiscripts/`: 初回セットアップ用 `run_before_*`
 - `tools/scripts/`: 保持する純粋スクリプト（セットアップ時に `~/.local/bin` へリンク）
-- `.codex/`: Codex 設定の管理対象（allowlist）
+- `dot_codex/`: Codex 設定の管理対象（`~/.codex/`、allowlist）
 - `ops/chezmoi/`: chezmoi 運用スクリプト（bootstrap/verify）
 - `ops/codex/`: Codex 設定取り込みスクリプト
 - `ops/install/`: セットアップスクリプト（mise導入 / runtime導入 / 純粋スクリプトリンク）
@@ -100,7 +100,7 @@ CHEZMOI_OPTIONAL_SETUP=1 ./ops/chezmoi/bootstrap.sh --source "$(pwd)"
 git status
 ```
 
-`.codex/.chezmoiignore` は allowlist 管理です。
+`dot_codex/.chezmoiignore` は allowlist 管理です。
 対象は `config.toml`, `rules/`, `agents/`, `contexts/`, `commands/`, `skills/` のみです。
 
 ## 検証
