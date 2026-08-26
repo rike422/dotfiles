@@ -1,0 +1,45 @@
+{{- /* GitHub release binaries. Versions are pinned; bump the variables below.
+     tokf cannot use gitHubLatestReleaseAssetURL: GitHub "latest" is a
+     non-CLI workspace tag (catalog-types) with no assets. */ -}}
+{{- $osArch := printf "%s/%s" .chezmoi.os .chezmoi.arch -}}
+{{- $tokfVersion := "v0.2.52" -}}
+{{- $sqzVersion := "v1.6.1" -}}
+{{- $tokfTriple := index (dict
+    "darwin/arm64" "aarch64-apple-darwin"
+    "darwin/amd64" "x86_64-apple-darwin"
+    "linux/amd64" "x86_64-unknown-linux-gnu"
+) $osArch -}}
+{{- $sqzTriple := index (dict
+    "darwin/arm64" "aarch64-apple-darwin"
+    "darwin/amd64" "x86_64-apple-darwin"
+    "linux/arm64" "aarch64-unknown-linux-musl"
+    "linux/amd64" "x86_64-unknown-linux-musl"
+) $osArch -}}
+{{- $tokfChecksum := index (dict
+    "aarch64-apple-darwin" "74ad628f88ddfedefffc99e3d9850d17bfced94f68422ef3507bf92416720e33"
+    "x86_64-apple-darwin" "85a3ad664fc6c109468aa06aea676a089a5345e23b2e369b59b8cce912b77046"
+    "x86_64-unknown-linux-gnu" "304b1eb45050f357c6cc2f4d593f12036311866d0216e9ae284d9ee963b16e9d"
+) $tokfTriple -}}
+{{- $sqzChecksum := index (dict
+    "aarch64-apple-darwin" "48abe3b8ec487a8603435913d1a009e6b1dbe23ea558d9a3556e958dd6038008"
+    "x86_64-apple-darwin" "73021aefe944434bdf2c4548005fc0fd7e975a54fce24259d3e74f6859cb009e"
+    "aarch64-unknown-linux-musl" "b331b9b2692fe28f6e3fa9ba31e4b6db429f88a88dc68fd573d7a080fc16fd10"
+    "x86_64-unknown-linux-musl" "04779bb4369c5c09efd2074f4462b2bd6ab300ba1af0a2778a7c379776a70f60"
+) $sqzTriple -}}
+{{- if $tokfTriple }}
+[".local/bin/tokf"]
+    type = "archive-file"
+    url = {{ printf "https://github.com/mpecan/tokf/releases/download/tokf-%s/tokf-%s-%s.tar.gz" $tokfVersion $tokfVersion $tokfTriple | quote }}
+    path = "tokf"
+    executable = true
+    checksum.sha256 = {{ $tokfChecksum | quote }}
+{{- end }}
+{{- if $sqzTriple }}
+
+[".local/bin/sqz"]
+    type = "archive-file"
+    url = {{ printf "https://github.com/ojuschugh1/sqz/releases/download/%s/sqz-%s-%s.tar.gz" $sqzVersion $sqzVersion $sqzTriple | quote }}
+    path = "sqz"
+    executable = true
+    checksum.sha256 = {{ $sqzChecksum | quote }}
+{{- end }}
