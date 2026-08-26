@@ -1,0 +1,130 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "json"
+require "open3"
+
+HELP = <<~EOS
+  Check pinned chezmoi externals against GitHub releases.
+  $ check-externals
+  $ check-externals --source /path/to/dotfiles
+EOS
+
+def die(message, code = 1)
+  warn("ERROR: #{message}")
+  exit(code)
+end
+
+def parse_args(argv)
+  source = ENV["CHEZMOI_SOURCE_DIR"]
+  until argv.empty?
+    case argv.shift
+    when "-h", "--help"
+      puts HELP
+      exit(0)
+    when "--source", "-s"
+      source = argv.shift
+      die("--source にはディレクトリを指定してください") if source.to_s.empty?
+    else
+      die("未知の引数です。--help を参照してください")
+    end
+  end
+  source
+end
+
+def resolve_source(source)
+  return source unless source.to_s.empty?
+
+  File.expand_path("../..", File.realpath(__FILE__))
+end
+
+def github_get(path)
+  url = "https://api.github.com#{path}"
+  cmd = ["curl", "-fsSL", "-H", "Accept: application/vnd.github+json"]
+  token = ENV["GH_TOKEN"] || ENV["GITHUB_TOKEN"] || ENV["CHEZMOI_GITHUB_TOKEN"]
+  cmd += ["-H", "Authorization: Bearer #{token}"] if token
+  cmd << url
+  out, err, status = Open3.capture3(*cmd)
+  die("GitHub API に失敗しました: #{url}\n#{err}") unless status.success?
+
+  JSON.parse(out)
+rescue JSON::ParserError => e
+  die("GitHub API の応答が JSON ではありません: #{url}\n#{e.message}")
+end
+
+def tools_from_tmpl(text)
+  versions = text.scan(/\$(\w+)Version\s*:=\s*"([^"]+)"/).to_h
+  die(".chezmoiexternal.toml.tmpl に $nameVersion が見つかりません") if versions.empty?
+
+  versions.map do |name, pinned|
+    match = text.match(%r{https://github.com/([^/]+)/(#{Regexp.escape(name)})/releases/download/})
+    die("#{name} の GitHub リポジトリ URL が見つかりません") unless match
+
+    { name: name, repo: "#{match[1]}/#{match[2]}", pinned: pinned }
+  end
+end
+
+def cli_asset?(release, name)
+  pattern = /\A#{Regexp.escape(name)}-v?\d/
+  Array(release["assets"]).any? { |asset| asset["name"].to_s.match?(pattern) }
+end
+
+def latest_release(repo, name)
+  latest = github_get("/repos/#{repo}/releases/latest")
+  return latest if cli_asset?(latest, name)
+
+  github_get("/repos/#{repo}/releases?per_page=50").each do |release|
+    next if release["draft"] || release["prerelease"]
+    return release if cli_asset?(release, name)
+  end
+
+  nil
+end
+
+def numeric_version(name, spec)
+  spec.to_s.sub(/\A#{Regexp.escape(name)}-/, "").sub(/\Av/, "")
+end
+
+def version_of(name, spec)
+  Gem::Version.new(numeric_version(name, spec))
+rescue ArgumentError
+  nil
+end
+
+def status_for(pinned, latest, name)
+  pinned_ver = version_of(name, pinned)
+  latest_ver = version_of(name, latest)
+  if pinned_ver && latest_ver
+    return :outdated if latest_ver > pinned_ver
+    return :ahead if latest_ver < pinned_ver
+    return :ok
+  end
+
+  numeric_version(name, pinned) == numeric_version(name, latest) ? :ok : :outdated
+end
+
+source = resolve_source(parse_args(ARGV.dup))
+die("required command not found: curl") unless system("command -v curl >/dev/null 2>&1")
+tmpl_path = File.join(source, ".chezmoiexternal.toml.tmpl")
+die("tmpl が見つかりません: #{tmpl_path}") unless File.file?(tmpl_path)
+
+tools = tools_from_tmpl(File.read(tmpl_path))
+width = tools.map { |tool| tool[:name].length }.max
+outdated = 0
+
+tools.each do |tool|
+  release = latest_release(tool[:repo], tool[:name])
+  unless release
+    printf("%-8s  %-*s  %s  (latest unknown)\n", "error", width, tool[:name], tool[:pinned])
+    outdated += 1
+    next
+  end
+
+  latest_tag = release["tag_name"].to_s
+  status = status_for(tool[:pinned], latest_tag, tool[:name])
+  label = { ok: "ok", outdated: "outdated", ahead: "ahead" }.fetch(status)
+  outdated += 1 unless status == :ok
+  printf("%-8s  %-*s  %s  (latest %s)\n", label, width, tool[:name], tool[:pinned], latest_tag)
+end
+
+exit(outdated.positive? ? 1 : 0)
