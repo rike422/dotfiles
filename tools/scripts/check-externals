@@ -64,7 +64,7 @@ end
 def resolve_source(source)
   return source unless source.to_s.empty?
 
-  File.expand_path("../..", File.realpath(__FILE__))
+  File.expand_path("../..", __dir__)
 end
 
 def github_request(path, accept: "application/vnd.github+json")

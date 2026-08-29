@@ -29,7 +29,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet -- .chezmoidata.yaml ops/externals/review; then
+          if git diff --quiet -- .chezmoidata.yaml; then
             echo "No external updates"
             exit 0
           fi
