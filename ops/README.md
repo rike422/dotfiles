@@ -23,3 +23,4 @@
 | `rbenv` / `goenv` / `nodebrew` / `phpenv` / `sdkman` / `evm` | `mise` に集約 |
 | 個別 install スクリプト運用 | `ops/chezmoi/bootstrap.sh` + `run_before_25/35` へ集約 |
 | ツール配布（runtime 以外） | `ops/install/setup-tools.sh` |
+| GitHub リリースバイナリ | `.chezmoidata.yaml` + `.chezmoiexternal.toml.tmpl` |

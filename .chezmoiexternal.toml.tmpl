@@ -1,0 +1,14 @@
+{{- /* GitHub release binaries. Versions and checksums live in .chezmoidata.yaml. */ -}}
+{{- $osArch := printf "%s/%s" .chezmoi.os .chezmoi.arch -}}
+{{- range $name := sortAlpha (keys .externals) -}}
+{{- $tool := index $.externals $name -}}
+{{- $triple := index $tool.triples $osArch -}}
+{{- if $triple }}
+[".local/bin/{{ $name }}"]
+    type = "archive-file"
+    url = {{ printf "https://github.com/%s/releases/download/%s%s/%s-%s-%s.tar.gz" $tool.repo $tool.tag_prefix $tool.version $name $tool.version $triple | quote }}
+    path = {{ $name | quote }}
+    executable = true
+    checksum.sha256 = {{ index $tool.checksums $triple | quote }}
+{{- end }}
+{{- end }}

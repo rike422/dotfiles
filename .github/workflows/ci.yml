@@ -56,6 +56,7 @@ jobs:
       - name: Tool script syntax check
         run: |
           ruby -c tools/scripts/color
+          ruby -c tools/scripts/check-externals
           ruby -c tools/scripts/ghbin
           perl -c tools/scripts/diff-highlight
           bash -n tools/scripts/github_latest_release.sh tools/scripts/ike-scan.sh

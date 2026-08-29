@@ -71,6 +71,7 @@ link_pure_scripts() {
   local target_bin="$2"
   local -a scripts=(
     color
+    check-externals
     diff-highlight
     ghbin
     github_latest_release.sh
