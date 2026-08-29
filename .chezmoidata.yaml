@@ -1,18 +1,4 @@
 externals:
-  sqz:
-    repo: ojuschugh1/sqz
-    version: v1.6.1
-    tag_prefix: ""
-    triples:
-      darwin/arm64: aarch64-apple-darwin
-      darwin/amd64: x86_64-apple-darwin
-      linux/arm64: aarch64-unknown-linux-musl
-      linux/amd64: x86_64-unknown-linux-musl
-    checksums:
-      aarch64-apple-darwin: 48abe3b8ec487a8603435913d1a009e6b1dbe23ea558d9a3556e958dd6038008
-      aarch64-unknown-linux-musl: b331b9b2692fe28f6e3fa9ba31e4b6db429f88a88dc68fd573d7a080fc16fd10
-      x86_64-apple-darwin: 73021aefe944434bdf2c4548005fc0fd7e975a54fce24259d3e74f6859cb009e
-      x86_64-unknown-linux-musl: 04779bb4369c5c09efd2074f4462b2bd6ab300ba1af0a2778a7c379776a70f60
   tokf:
     repo: mpecan/tokf
     version: v0.2.52

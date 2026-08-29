@@ -16,4 +16,3 @@
 現在の external:
 
 - `tokf`
-- `sqz`
