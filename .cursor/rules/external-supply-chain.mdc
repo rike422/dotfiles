@@ -1,0 +1,14 @@
+---
+description: 第三者 CLI の更新 PR ではピンではなく上流 diff を読む
+globs: ops/externals/review/**
+alwaysApply: false
+---
+
+# External supply-chain review
+
+`.chezmoidata.yaml` のバージョン変更だけでは悪意は分からない。`ops/externals/review/` がレビュー対象。
+
+1. `README.md` と各 `{name}.diff` を読む。truncated なら Compare URL も見る。
+2. 新規ネットワーク、認証情報、install-time スクリプト、難読化、デフォルト権限の拡大を探す。
+3. ツールごとに `merge` / `merge with notes` / `do not merge` を出す。
+4. heuristic ヒットは手がかりであり、自動拒否ではない。

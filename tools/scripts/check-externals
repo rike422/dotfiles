@@ -1,14 +1,34 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require "digest"
+require "fileutils"
 require "json"
 require "open3"
+require "tempfile"
+require "uri"
+require "yaml"
 
 HELP = <<~EOS
   Check pinned chezmoi externals against GitHub releases.
   $ check-externals
   $ check-externals --source /path/to/dotfiles
+  $ check-externals --bump
+  $ check-externals --bump --pr-body /tmp/pr.md
 EOS
+
+REVIEW_DIR = "ops/externals/review"
+MAX_DIFF_BYTES = 512 * 1024
+HEURISTICS = [
+  ["curl-pipe-shell", /curl[^\n]*\|\s*(?:ba)?sh/i],
+  ["wget-pipe-shell", /wget[^\n]*\|\s*(?:ba)?sh/i],
+  ["eval-call", /\beval\s*\(/],
+  ["base64-decode", /base64\s+(?:-d|--decode)/],
+  ["preinstall", /\bpreinstall\b/],
+  ["postinstall", /\bpostinstall\b/],
+  ["hardcoded-github-token", /(?:ghp|github_pat)_[A-Za-z0-9_]+/],
+  ["env-exfil", /(?:curl|wget)[^\n]*(?:\$\{?(?:GITHUB_TOKEN|GH_TOKEN|AWS_SECRET|NPM_TOKEN))/]
+].freeze
 
 def die(message, code = 1)
   warn("ERROR: #{message}")
@@ -16,20 +36,29 @@ def die(message, code = 1)
 end
 
 def parse_args(argv)
-  source = ENV["CHEZMOI_SOURCE_DIR"]
+  opts = {
+    source: ENV["CHEZMOI_SOURCE_DIR"],
+    bump: false,
+    pr_body: nil
+  }
   until argv.empty?
     case argv.shift
     when "-h", "--help"
       puts HELP
       exit(0)
     when "--source", "-s"
-      source = argv.shift
-      die("--source にはディレクトリを指定してください") if source.to_s.empty?
+      opts[:source] = argv.shift
+      die("--source にはディレクトリを指定してください") if opts[:source].to_s.empty?
+    when "--bump"
+      opts[:bump] = true
+    when "--pr-body"
+      opts[:pr_body] = argv.shift
+      die("--pr-body にはパスを指定してください") if opts[:pr_body].to_s.empty?
     else
       die("未知の引数です。--help を参照してください")
     end
   end
-  source
+  opts
 end
 
 def resolve_source(source)
@@ -38,29 +67,68 @@ def resolve_source(source)
   File.expand_path("../..", File.realpath(__FILE__))
 end
 
-def github_get(path)
+def github_request(path, accept: "application/vnd.github+json")
   url = "https://api.github.com#{path}"
-  cmd = ["curl", "-fsSL", "-H", "Accept: application/vnd.github+json"]
+  cmd = ["curl", "-fsSL", "-H", "Accept: #{accept}"]
   token = ENV["GH_TOKEN"] || ENV["GITHUB_TOKEN"] || ENV["CHEZMOI_GITHUB_TOKEN"]
   cmd += ["-H", "Authorization: Bearer #{token}"] if token
   cmd << url
   out, err, status = Open3.capture3(*cmd)
-  die("GitHub API に失敗しました: #{url}\n#{err}") unless status.success?
+  [out, status.success?, err, url]
+end
+
+def github_get(path)
+  out, ok, err, url = github_request(path)
+  die("GitHub API に失敗しました: #{url}\n#{err}") unless ok
 
   JSON.parse(out)
 rescue JSON::ParserError => e
   die("GitHub API の応答が JSON ではありません: #{url}\n#{e.message}")
 end
 
-def tools_from_tmpl(text)
-  versions = text.scan(/\$(\w+)Version\s*:=\s*"([^"]+)"/).to_h
-  die(".chezmoiexternal.toml.tmpl に $nameVersion が見つかりません") if versions.empty?
+def github_try_get(path)
+  out, ok, = github_request(path)
+  return unless ok
 
-  versions.map do |name, pinned|
-    match = text.match(%r{https://github.com/([^/]+)/(#{Regexp.escape(name)})/releases/download/})
-    die("#{name} の GitHub リポジトリ URL が見つかりません") unless match
+  JSON.parse(out)
+rescue JSON::ParserError
+  nil
+end
 
-    { name: name, repo: "#{match[1]}/#{match[2]}", pinned: pinned }
+def github_try_diff(repo, from_tag, to_tag)
+  path = "/repos/#{repo}/compare/#{URI.encode_www_form_component(from_tag)}...#{URI.encode_www_form_component(to_tag)}"
+  out, ok, = github_request(path, accept: "application/vnd.github.diff")
+  ok ? out : nil
+end
+
+def curl_get(url)
+  out, _err, status = Open3.capture3("curl", "-fsSL", url)
+  return out if status.success?
+
+  nil
+end
+
+def curl_file(url, path)
+  _out, err, status = Open3.capture3("curl", "-fsSL", "-o", path, url)
+  die("ダウンロードに失敗しました: #{url}\n#{err}") unless status.success?
+end
+
+def tools_from_data(data)
+  externals = data["externals"]
+  die(".chezmoidata.yaml に externals がありません") unless externals.is_a?(Hash) && !externals.empty?
+
+  externals.keys.sort.map do |name|
+    tool = externals[name]
+    die("#{name} の定義が不正です") unless tool.is_a?(Hash)
+
+    {
+      name: name,
+      repo: tool.fetch("repo"),
+      pinned: tool.fetch("version"),
+      tag_prefix: tool["tag_prefix"].to_s,
+      triples: tool.fetch("triples"),
+      checksums: tool.fetch("checksums")
+    }
   end
 end
 
@@ -85,6 +153,10 @@ def numeric_version(name, spec)
   spec.to_s.sub(/\A#{Regexp.escape(name)}-/, "").sub(/\Av/, "")
 end
 
+def pin_version(name, tag)
+  "v#{numeric_version(name, tag)}"
+end
+
 def version_of(name, spec)
   Gem::Version.new(numeric_version(name, spec))
 rescue ArgumentError
@@ -103,28 +175,236 @@ def status_for(pinned, latest, name)
   numeric_version(name, pinned) == numeric_version(name, latest) ? :ok : :outdated
 end
 
-source = resolve_source(parse_args(ARGV.dup))
-die("required command not found: curl") unless system("command -v curl >/dev/null 2>&1")
-tmpl_path = File.join(source, ".chezmoiexternal.toml.tmpl")
-die("tmpl が見つかりません: #{tmpl_path}") unless File.file?(tmpl_path)
+def major_bump?(name, pinned, latest)
+  pinned_ver = version_of(name, pinned)
+  latest_ver = version_of(name, latest)
+  return false unless pinned_ver && latest_ver
 
-tools = tools_from_tmpl(File.read(tmpl_path))
+  pinned_ver.segments.first != latest_ver.segments.first
+end
+
+def parse_sha256(text, source)
+  token = text.to_s.strip.split.first.to_s
+  die("checksum が不正です (#{source}): #{token}") unless token.match?(/\A[0-9a-f]{64}\z/i)
+
+  token.downcase
+end
+
+def fetch_sha256(tool, version, triple)
+  tag = "#{tool[:tag_prefix]}#{version}"
+  asset = "#{tool[:name]}-#{version}-#{triple}.tar.gz"
+  url = "https://github.com/#{tool[:repo]}/releases/download/#{tag}/#{asset}"
+  sidecar = curl_get("#{url}.sha256")
+  return parse_sha256(sidecar, "#{url}.sha256") if sidecar
+
+  Tempfile.create(["#{tool[:name]}-", ".tar.gz"]) do |file|
+    file.close
+    curl_file(url, file.path)
+    Digest::SHA256.file(file.path).hexdigest
+  end
+end
+
+def dump_data(data)
+  externals = data.fetch("externals").sort.to_h.transform_values do |tool|
+    tool.merge(
+      "triples" => tool.fetch("triples").sort.to_h,
+      "checksums" => tool.fetch("checksums").sort.to_h
+    )
+  end
+  { "externals" => externals }.to_yaml
+end
+
+def truncate_notes(text)
+  notes = text.to_s.strip.gsub("```", "'''")
+  return "(release notes なし)" if notes.empty?
+  return notes if notes.length <= 4000
+
+  "#{notes[0, 4000]}\n\n…(truncated)"
+end
+
+def pr_body_for(changes)
+  sections = changes.map do |change|
+    name = change[:name]
+    from = change[:from]
+    to = change[:to]
+    tag = change[:tag]
+    repo = change[:repo]
+    warning = major_bump?(name, from, tag) ? "\n- ⚠️ major bump です。破壊的変更の可能性が高いです。" : ""
+    <<~MD
+      ### `#{name}` #{from} → #{to}
+      - Release: https://github.com/#{repo}/releases/tag/#{tag}
+      - Compare: https://github.com/#{repo}/compare/#{change[:from_tag]}...#{tag}#{warning}
+
+      ```
+      #{truncate_notes(change[:notes])}
+      ```
+
+      - [ ] エージェントが `#{REVIEW_DIR}/` の diff を読んだ
+      - [ ] リリースノートを読んだ
+      - [ ] 不審なメンテナ変更・想定外の権限要求がない
+      - [ ] GitHub 上の資産名と checksum が PR のピンと一致する
+    MD
+  end
+
+  <<~MD
+    ## レビューしてからマージしてください
+
+    自動マージしません。プリリリースは除外し、checksum を取り直したピン更新だけです。
+    `.chezmoidata.yaml` のピン変更だけでは上流コードは見えません。エージェントには **`#{REVIEW_DIR}/` を読ませて** merge / 保留 / 拒否 を出してください。
+    マージ後に `chezmoi apply` するとバイナリが入れ替わります。
+
+    #{sections.join("\n")}
+  MD
+end
+
+def scan_heuristics(diff)
+  HEURISTICS.filter_map do |label, pattern|
+    count = diff.to_s.scan(pattern).size
+    next if count.zero?
+
+    "#{label} (#{count})"
+  end
+end
+
+def write_review_pack(source, changes)
+  dir = File.join(source, REVIEW_DIR)
+  FileUtils.mkdir_p(dir)
+  Dir.children(dir).each do |child|
+    path = File.join(dir, child)
+    File.delete(path) if File.file?(path)
+  end
+
+  summaries = changes.map do |change|
+    spec = "#{URI.encode_www_form_component(change[:from_tag])}...#{URI.encode_www_form_component(change[:tag])}"
+    compare = github_try_get("/repos/#{change[:repo]}/compare/#{spec}")
+    diff = github_try_diff(change[:repo], change[:from_tag], change[:tag]).to_s
+    truncated = false
+    if diff.bytesize > MAX_DIFF_BYTES
+      diff = diff.byteslice(0, MAX_DIFF_BYTES)
+      truncated = true
+    end
+    File.write(File.join(dir, "#{change[:name]}.diff"), diff)
+
+    files = Array(compare && compare["files"])
+    File.write(
+      File.join(dir, "#{change[:name]}.files.md"),
+      files.map { |file| "- `#{file["status"]}` `#{file["filename"]}` (+#{file["additions"]}/-#{file["deletions"]})" }.join("\n") + "\n"
+    )
+
+    hits = scan_heuristics(diff)
+    {
+      name: change[:name],
+      repo: change[:repo],
+      from: change[:from],
+      to: change[:to],
+      tag: change[:tag],
+      from_tag: change[:from_tag],
+      commits: Array(compare && compare["commits"]).length,
+      files: files.length,
+      api_truncated: compare && compare["truncated"],
+      diff_truncated: truncated,
+      missing_diff: diff.empty?,
+      heuristics: hits
+    }
+  end
+
+  File.write(File.join(dir, "README.md"), review_readme(summaries))
+end
+
+def review_readme(summaries)
+  blocks = summaries.map do |summary|
+    compare_url = "https://github.com/#{summary[:repo]}/compare/#{summary[:from_tag]}...#{summary[:tag]}"
+    flags = []
+    flags << "compare API が取れませんでした" if summary[:missing_diff] && summary[:files].zero?
+    flags << "diff を #{MAX_DIFF_BYTES} bytes で打ち切りました。残りは Compare を見てください" if summary[:diff_truncated]
+    flags << "GitHub compare が truncated です" if summary[:api_truncated]
+    flags << "heuristic: #{summary[:heuristics].join(", ")}" if summary[:heuristics].any?
+    flag_text = flags.empty? ? "特記なし" : flags.map { |line| "- #{line}" }.join("\n")
+    <<~MD
+      ### #{summary[:name]} #{summary[:from]} → #{summary[:to]}
+      - Compare: #{compare_url}
+      - commits: #{summary[:commits]}, files: #{summary[:files]}
+      - diff: `#{summary[:name]}.diff`
+      - files: `#{summary[:name]}.files.md`
+
+      #{flag_text}
+    MD
+  end
+
+  <<~MD
+    # Upstream supply-chain review
+
+    このディレクトリは **第三者 CLI のソース差分** です。`.chezmoidata.yaml` のバージョン数字だけ見ても悪意は分かりません。
+
+    やってほしいこと:
+    1. 各 `{name}.diff` を読む（truncated なら Compare URL も見る）
+    2. 新規ネットワーク、認証情報、install-time スクリプト、難読化、デフォルト権限の拡大を探す
+    3. 最後に `merge` / `merge with notes` / `do not merge` をツールごとに出す
+
+    heuristic ヒットは手がかりであり、自動拒否ではありません。
+
+    #{blocks.join("\n")}
+  MD
+end
+
+opts = parse_args(ARGV.dup)
+source = resolve_source(opts[:source])
+die("required command not found: curl") unless system("command -v curl >/dev/null 2>&1")
+
+data_path = File.join(source, ".chezmoidata.yaml")
+die("data が見つかりません: #{data_path}") unless File.file?(data_path)
+
+data = YAML.safe_load_file(data_path)
+tools = tools_from_data(data)
 width = tools.map { |tool| tool[:name].length }.max
-outdated = 0
+failures = 0
+changes = []
 
 tools.each do |tool|
   release = latest_release(tool[:repo], tool[:name])
   unless release
     printf("%-8s  %-*s  %s  (latest unknown)\n", "error", width, tool[:name], tool[:pinned])
-    outdated += 1
+    failures += 1
     next
   end
 
   latest_tag = release["tag_name"].to_s
   status = status_for(tool[:pinned], latest_tag, tool[:name])
   label = { ok: "ok", outdated: "outdated", ahead: "ahead" }.fetch(status)
-  outdated += 1 unless status == :ok
   printf("%-8s  %-*s  %s  (latest %s)\n", label, width, tool[:name], tool[:pinned], latest_tag)
+
+  if status == :outdated && opts[:bump]
+    new_version = pin_version(tool[:name], latest_tag)
+    checksums = tool[:triples].values.uniq.to_h do |triple|
+      [triple, fetch_sha256(tool, new_version, triple)]
+    end
+    data["externals"][tool[:name]]["version"] = new_version
+    data["externals"][tool[:name]]["checksums"] = checksums
+    changes << {
+      name: tool[:name],
+      repo: tool[:repo],
+      from: tool[:pinned],
+      to: new_version,
+      tag: latest_tag,
+      from_tag: "#{tool[:tag_prefix]}#{tool[:pinned]}",
+      notes: release["body"]
+    }
+    next
+  end
+
+  failures += 1 unless status == :ok
 end
 
-exit(outdated.positive? ? 1 : 0)
+if opts[:bump] && changes.any?
+  File.write(data_path, dump_data(data))
+  write_review_pack(source, changes)
+  warn("bumped: #{changes.map { |c| "#{c[:name]} #{c[:from]} -> #{c[:to]}" }.join(", ")}")
+  warn("review pack: #{File.join(source, REVIEW_DIR)}")
+end
+
+if opts[:pr_body]
+  body = changes.any? ? pr_body_for(changes) : ""
+  File.write(opts[:pr_body], body)
+end
+
+exit(failures.positive? ? 1 : 0)

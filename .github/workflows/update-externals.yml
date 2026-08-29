@@ -1,0 +1,55 @@
+name: Update externals
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: update-externals
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Bump pinned externals
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ruby tools/scripts/check-externals --bump --pr-body "$RUNNER_TEMP/externals-pr.md"
+
+      - name: Open or update pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- .chezmoidata.yaml ops/externals/review; then
+            echo "No external updates"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B codex/update-externals
+          git add .chezmoidata.yaml ops/externals/review
+          git commit -m "$(cat <<'EOF'
+          chore: chezmoi externals を最新の安定版にピンし直す
+
+          自動マージしません。ops/externals/review の上流 diff をエージェントに読ませてからマージしてください。
+          EOF
+          )"
+          git push --force origin HEAD
+
+          if gh pr view --json number --jq .number >/dev/null 2>&1; then
+            gh pr edit --body-file "$RUNNER_TEMP/externals-pr.md"
+          else
+            gh pr create \
+              --title "chore: chezmoi externals を最新の安定版にピンし直す" \
+              --body-file "$RUNNER_TEMP/externals-pr.md"
+          fi
