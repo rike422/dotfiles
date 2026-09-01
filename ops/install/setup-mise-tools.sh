@@ -267,9 +267,12 @@ main() {
   fi
   SOURCE_DIR="$(cd -- "$SOURCE_DIR" && pwd -P)"
 
-  config_file="$SOURCE_DIR/.config/mise/config.toml"
+  config_file="$SOURCE_DIR/dot_config/mise/config.toml"
   if [[ ! -f "$config_file" ]]; then
-    skip_or_fail "mise global config file not found: $config_file"
+    config_file="$SOURCE_DIR/.config/mise/config.toml"
+  fi
+  if [[ ! -f "$config_file" ]]; then
+    skip_or_fail "mise global config file not found under source directory: $SOURCE_DIR"
     write_status_file
     return $?
   fi

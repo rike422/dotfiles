@@ -5,6 +5,7 @@ mise_tool_specs() {
   cat <<'EOF'
 ruby|latest|required|
 node|lts|required|
+apm|0.29.0|required|github:microsoft/apm
 go|latest|required|
 java|latest|required|
 php|latest|required|
