@@ -38,6 +38,7 @@ jobs:
             ops/chezmoi/verify.sh \
             ops/install/setup-mise.sh \
             ops/install/setup-mise-tools.sh \
+            tests/setup-mise-tools-test.sh \
             ops/install/setup-tools.sh \
             ops/mise/tool-specs.sh \
             ops/codex/import.sh \
@@ -52,6 +53,9 @@ jobs:
 
       - name: Bash profile syntax check
         run: bash -n dot_bash_profile
+
+      - name: Mise tool setup tests
+        run: bash tests/setup-mise-tools-test.sh
 
       - name: Tool script syntax check
         run: |
