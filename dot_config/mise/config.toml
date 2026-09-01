@@ -12,6 +12,7 @@ paranoid = false
 [tools]
 ruby = "latest"
 node = "lts"
+"github:microsoft/apm" = "0.29.0"
 go = "latest"
 java = "latest"
 php = "latest"
