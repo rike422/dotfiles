@@ -1,0 +1,74 @@
+# godot/gut.toml — keep GUT's verdict, drop Godot engine boot and passing tests.
+#
+# Matches `godot --headless -s addons/gut/gut_cmdln.gd` (and Godot.app).
+# Do not set `command = "godot"`: that would filter the editor too.
+# Do not put `-glog` in `run`: tokf history only sees the command it ran.
+
+command = [
+  "godot * gut_cmdln.gd",
+  "godot * addons/gut/gut_cmdln.gd",
+  "godot * res://addons/gut/gut_cmdln.gd",
+  "godot --path * * addons/gut/gut_cmdln.gd",
+  "godot --path * * * addons/gut/gut_cmdln.gd",
+  "godot -s --path * addons/gut/gut_cmdln.gd",
+  "Godot * gut_cmdln.gd",
+  "Godot * addons/gut/gut_cmdln.gd",
+  "Godot * res://addons/gut/gut_cmdln.gd",
+  "Godot --path * * addons/gut/gut_cmdln.gd",
+  "Godot --path * * * addons/gut/gut_cmdln.gd",
+  "Godot -s --path * addons/gut/gut_cmdln.gd",
+]
+description = "Strip Godot boot and passing GUT tests; show failures and the run summary"
+
+strip_ansi = true
+passthrough_args = [
+  "-gh",
+  "-gpo",
+  "-gprint_gutconfig_sample",
+  "--help",
+]
+
+skip = [
+  "^Godot Engine",
+  "^Vulkan ",
+  "^Metal ",
+  "^OpenGL ",
+  "^WARNING: ",
+  "^   at: ",
+  "^---  GUT  ---$",
+  "^\\[INFO\\]:  using \\[",
+  "^GUT v",
+  "^\\* ",
+  "^\\s*\\[Passed\\]",
+  "^\\d+/\\d+ passed\\.$",
+  "^==============================================$",
+  "^= Run Summary$",
+  "^Totals$",
+  "^------$",
+]
+
+[on_success]
+extract = { pattern = "Passing Tests\\s+(\\d+)", output = "✓ gut: {1} passed" }
+
+[on_failure]
+keep = [
+  "^\\[Failed\\]",
+  "^\\s*\\[Failed\\]",
+  "^\\[ERROR\\]",
+  "^\\s*\\[ERROR\\]",
+  "^SCRIPT ERROR",
+  "^- ",
+  "^res://",
+  "^  at line ",
+  "^\\s+at line ",
+  "^Passing Tests",
+  "^Failing Tests",
+  "^Tests\\s+",
+  "^Asserts",
+  "^---- ",
+  "^Nothing was run",
+  "^On the one hand nothing failed",
+]
+
+[fallback]
+tail = 30

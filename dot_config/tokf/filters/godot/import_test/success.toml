@@ -1,0 +1,22 @@
+name = "successful import removes routine boot and progress output"
+exit_code = 0
+inline = """
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+Metal 3.1 - Forward+ - Using Device: Apple M3
+
+[   0% ] first_scan_filesystem | Started project initialization (5 steps)
+[  50% ] first_scan_filesystem | Creating autoload scripts...
+[ DONE ] first_scan_filesystem
+[   0% ] update_scripts_classes | Started registering global classes (79 steps)
+[  98% ] update_scripts_classes |
+[ DONE ] update_scripts_classes
+"""
+
+[[expect]]
+not_contains = "Godot Engine"
+[[expect]]
+not_contains = "Metal 3.1"
+[[expect]]
+not_contains = "first_scan_filesystem"
+[[expect]]
+not_contains = "update_scripts_classes"

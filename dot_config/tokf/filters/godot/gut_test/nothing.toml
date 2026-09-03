@@ -1,0 +1,14 @@
+name = "nothing run stays visible"
+exit_code = 1
+inline = """
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+---  GUT  ---
+[ERROR]:  Nothing was run.
+On the one hand nothing failed, on the other hand nothing did anything.
+"""
+
+[[expect]]
+contains = "Nothing was run"
+[[expect]]
+not_contains = "Godot Engine"

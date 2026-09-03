@@ -1,0 +1,35 @@
+# godot/export.toml — remove routine export progress while preserving results.
+#
+# Export warnings may coexist with status 0, so both branches return the filtered
+# output instead of replacing it with a fixed success/failure message.
+
+command = [
+  "godot --export-release *",
+  "godot --export-debug *",
+  "godot * --export-release *",
+  "godot * --export-debug *",
+  "Godot --export-release *",
+  "Godot --export-debug *",
+  "Godot * --export-release *",
+  "Godot * --export-debug *",
+]
+description = "Strip Godot export boot and progress noise while preserving artifacts and diagnostics"
+
+strip_ansi = true
+collapse_empty_lines = true
+
+skip = [
+  "^Godot Engine",
+  "^Vulkan ",
+  "^Metal ",
+  "^OpenGL ",
+  "^\\[\\s*\\d+%\\s*\\]",
+  "^\\[ DONE \\]",
+  "^\\s*$",
+]
+
+[on_success]
+output = "{output}"
+
+[on_failure]
+output = "{output}"

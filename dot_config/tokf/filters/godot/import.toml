@@ -1,0 +1,33 @@
+# godot/import.toml — drop routine editor import progress while preserving diagnostics.
+#
+# Godot can emit ERROR/WARNING lines and still exit with status 0, so this filter
+# never replaces successful output with a fixed success message.
+
+command = [
+  "godot --import",
+  "godot * --import",
+  "godot * --import *",
+  "Godot --import",
+  "Godot * --import",
+  "Godot * --import *",
+]
+description = "Strip Godot import boot and progress noise while preserving all diagnostics"
+
+strip_ansi = true
+collapse_empty_lines = true
+
+skip = [
+  "^Godot Engine",
+  "^Vulkan ",
+  "^Metal ",
+  "^OpenGL ",
+  "^\\[\\s*\\d+%\\s*\\]",
+  "^\\[ DONE \\]",
+  "^\\s*$",
+]
+
+[on_success]
+output = "{output}"
+
+[on_failure]
+output = "{output}"

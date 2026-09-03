@@ -1,0 +1,21 @@
+name = "successful export keeps artifact information and removes progress"
+exit_code = 0
+inline = """
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+OpenGL API 4.1 - Compatibility - Using Device: Apple - Apple M3
+[   0% ] export | Starting export for Web
+[  50% ] export | Exporting project files
+[ DONE ] export
+Exported Web build to build/web/index.html
+"""
+
+[[expect]]
+contains = "Exported Web build to build/web/index.html"
+[[expect]]
+not_contains = "Godot Engine"
+[[expect]]
+not_contains = "OpenGL API"
+[[expect]]
+not_contains = "[  50% ]"
+[[expect]]
+not_contains = "[ DONE ]"
