@@ -1,0 +1,21 @@
+name = "headless tool output survives while engine boot lines are removed"
+exit_code = 0
+inline = """
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+Metal 3.1 - Forward+ - Using Device: Apple M3
+
+task=example_seed42 runs=3
+mean_tick_ms=1.84 p95_tick_ms=2.31
+result=ok
+"""
+
+[[expect]]
+contains = "task=example_seed42 runs=3"
+[[expect]]
+contains = "mean_tick_ms=1.84 p95_tick_ms=2.31"
+[[expect]]
+contains = "result=ok"
+[[expect]]
+not_contains = "Godot Engine"
+[[expect]]
+not_contains = "Metal 3.1"

@@ -1,0 +1,24 @@
+name = "failed import keeps script errors and locations"
+exit_code = 1
+inline = """
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+Vulkan 1.3 - Forward+ - Using Device #0: Example GPU
+[  42% ] update_scripts_classes | ExampleType
+SCRIPT ERROR: Parse Error: Could not find type "ExampleType" in the current scope.
+          at: GDScript::reload (res://scripts/example.gd:12)
+ERROR: Failed to load script "res://scripts/example.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:3022)
+"""
+
+[[expect]]
+contains = "SCRIPT ERROR: Parse Error"
+[[expect]]
+contains = "res://scripts/example.gd:12"
+[[expect]]
+contains = "ERROR: Failed to load script"
+[[expect]]
+contains = "at: load (modules/gdscript/gdscript.cpp:3022)"
+[[expect]]
+not_contains = "Godot Engine"
+[[expect]]
+not_contains = "update_scripts_classes"

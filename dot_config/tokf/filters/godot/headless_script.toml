@@ -1,0 +1,31 @@
+# godot/headless_script.toml — remove engine boot noise from project tools.
+#
+# Tool output is domain-specific and must remain intact.  Only stable Godot boot
+# lines and blank lines are removed; diagnostics are never collapsed by status.
+
+command = [
+  "godot --headless -s *",
+  "godot --headless * -s *",
+  "godot * --headless * -s *",
+  "Godot --headless -s *",
+  "Godot --headless * -s *",
+  "Godot * --headless * -s *",
+]
+description = "Strip Godot boot noise while preserving headless tool output and diagnostics"
+
+strip_ansi = true
+collapse_empty_lines = true
+
+skip = [
+  "^Godot Engine",
+  "^Vulkan ",
+  "^Metal ",
+  "^OpenGL ",
+  "^\\s*$",
+]
+
+[on_success]
+output = "{output}"
+
+[on_failure]
+output = "{output}"

@@ -1,0 +1,22 @@
+name = "diagnostics survive even when Godot exits zero"
+exit_code = 0
+inline = """
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+[   0% ] first_scan_filesystem | Started project initialization (5 steps)
+ERROR: Failed loading resource: res://missing.gd.
+   at: _load (core/io/resource_loader.cpp:343)
+WARNING: Addon 'res://addons/missing/plugin.cfg' failed to load.
+     at: set_addon_plugin_enabled (editor/editor_node.cpp:4320)
+[ DONE ] first_scan_filesystem
+"""
+
+[[expect]]
+contains = "ERROR: Failed loading resource: res://missing.gd."
+[[expect]]
+contains = "at: _load (core/io/resource_loader.cpp:343)"
+[[expect]]
+contains = "WARNING: Addon 'res://addons/missing/plugin.cfg' failed to load."
+[[expect]]
+contains = "at: set_addon_plugin_enabled (editor/editor_node.cpp:4320)"
+[[expect]]
+not_contains = "first_scan_filesystem"

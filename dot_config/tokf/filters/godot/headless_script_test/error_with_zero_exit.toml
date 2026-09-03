@@ -1,0 +1,20 @@
+name = "headless tool diagnostics survive a zero exit code"
+exit_code = 0
+inline = """
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+ERROR: Invalid input fixture: res://test/fixtures/missing.json
+   at: push_error (core/variant/variant_utility.cpp:1024)
+WARNING: No inputs selected.
+result=empty
+"""
+
+[[expect]]
+contains = "ERROR: Invalid input fixture"
+[[expect]]
+contains = "at: push_error"
+[[expect]]
+contains = "WARNING: No inputs selected."
+[[expect]]
+contains = "result=empty"
+[[expect]]
+not_contains = "Godot Engine"

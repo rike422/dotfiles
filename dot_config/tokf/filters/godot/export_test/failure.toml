@@ -1,0 +1,23 @@
+name = "failed export keeps its failure reason"
+exit_code = 1
+inline = """
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+[   0% ] export | Starting export for Web
+ERROR: Cannot export project with preset "Web" due to configuration errors.
+   at: _export_project_to_path (editor/export/editor_export_platform.cpp:1001)
+Web export failed.
+Install the matching Godot export templates.
+"""
+
+[[expect]]
+contains = "ERROR: Cannot export project with preset"
+[[expect]]
+contains = "at: _export_project_to_path"
+[[expect]]
+contains = "Web export failed."
+[[expect]]
+contains = "Install the matching Godot export templates."
+[[expect]]
+not_contains = "Godot Engine"
+[[expect]]
+not_contains = "[   0% ]"

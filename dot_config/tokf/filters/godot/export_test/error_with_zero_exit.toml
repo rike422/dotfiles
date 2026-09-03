@@ -1,0 +1,25 @@
+name = "export warning and error survive a zero exit code"
+exit_code = 0
+inline = """
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+[  25% ] export | Importing resources
+WARNING: File 'res://debug_only.json' is not included in the export.
+     at: _export_file (editor/export/editor_export_platform.cpp:621)
+ERROR: Cannot open file 'res://optional_missing.png'.
+   at: open (core/io/file_access.cpp:811)
+[ DONE ] export
+Exported Web build to build/web/index.html
+"""
+
+[[expect]]
+contains = "WARNING: File 'res://debug_only.json'"
+[[expect]]
+contains = "at: _export_file"
+[[expect]]
+contains = "ERROR: Cannot open file"
+[[expect]]
+contains = "at: open"
+[[expect]]
+contains = "Exported Web build to build/web/index.html"
+[[expect]]
+not_contains = "[  25% ]"
