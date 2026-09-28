@@ -9,9 +9,9 @@
 
 heuristic ヒットは手がかりであり、自動拒否ではありません。
 
-### tokf v0.2.52 → v0.2.53
-- Compare: https://github.com/mpecan/tokf/compare/tokf-v0.2.52...tokf-v0.2.53
-- commits: 11, files: 79
+### tokf v0.2.53 → v0.2.54
+- Compare: https://github.com/mpecan/tokf/compare/tokf-v0.2.53...tokf-v0.2.54
+- commits: 3, files: 32
 - diff: `tokf.diff`
 - files: `tokf.files.md`
 
