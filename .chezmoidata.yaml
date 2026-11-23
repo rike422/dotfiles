@@ -2,13 +2,13 @@
 externals:
   tokf:
     repo: mpecan/tokf
-    version: v0.2.53
+    version: v0.2.54
     tag_prefix: tokf-
     triples:
       darwin/amd64: x86_64-apple-darwin
       darwin/arm64: aarch64-apple-darwin
       linux/amd64: x86_64-unknown-linux-gnu
     checksums:
-      aarch64-apple-darwin: d1687b01a69e85221f598ef06bd224b49225846a2b76e87c20f47a08d58bbe8d
-      x86_64-apple-darwin: 8f6193547d67ba3bd1b51a90ea4618b0282a32fa29fba1b70ebb2d8487d34b14
-      x86_64-unknown-linux-gnu: 65db22c562b03929f613f6474e4aea892ab5270dd43dd25ce5f1fe66eb5ca126
+      aarch64-apple-darwin: 17b1118e726de0adafc2534fce10b36e157db9ba037eee59e29c2fd26df433d9
+      x86_64-apple-darwin: '09eb422adcb4c467c6b510b98131187e1cd4ca3074ef5e0d05568f65dd515f16'
+      x86_64-unknown-linux-gnu: 50484ad571ef4a7b36386469bb2d07b7f019db1cc22e3895cc9ae8410f8c01f4
